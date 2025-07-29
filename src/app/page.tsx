@@ -1,13 +1,16 @@
+// src/app/page.tsx
+// 首页组件，展示应用的主要内容和功能
+
 'use client';
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ArrowDown, Code, PenTool, Sparkles, Send } from 'lucide-react';
 
-// --- 动画变体 (保持不变) ---
+// --- 动画变体  ---
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -30,7 +33,6 @@ export default function HomePage() {
     <div className={cn(
       "w-full h-full flex flex-col items-center justify-center text-center relative overflow-hidden px-4",
       "font-sans",
-      // ... (所有主题字体类名保持不变)
       "theme-warm-sunshine:font-serif", "theme-dopamine-pop:font-dopamine", "theme-zen-ink:font-sans",
       "theme-solarpunk-utopia:font-solarpunk", "theme-rustic-artisan:font-artisan",
       "theme-brutalist-glitch:font-brutalist theme-brutalist-glitch:uppercase",
@@ -100,20 +102,28 @@ export default function HomePage() {
           className="mt-12 flex flex-wrap justify-center gap-4"
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button size="lg" asChild className="bg-white text-black hover:bg-neutral-200">
-              <Link href="/projects">
-                <ArrowDown className="mr-2 h-5 w-5" />
-                查看我的作品
-              </Link>
-            </Button>
+            <Link
+              href="/projects"
+              className={cn(
+                buttonVariants({ size: 'lg' }),
+                "bg-white text-black hover:bg-neutral-200"
+              )}
+            >
+              <ArrowDown className="mr-2 h-5 w-5" />
+              查看我的作品
+            </Link>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button size="lg" variant="ghost" asChild className="hover:bg-white/10 hover:text-white">
-              <Link href="/contact">
-                <Send className="mr-2 h-5 w-5" />
-                联系我
-              </Link>
-            </Button>
+            <Link
+              href="/contact"
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'lg' }),
+                "hover:bg-white/10 hover:text-white"
+              )}
+            >
+              <Send className="mr-2 h-5 w-5" />
+              联系我
+            </Link>
           </motion.div>
         </motion.div>
       </div>

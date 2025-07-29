@@ -1,6 +1,7 @@
+// src/components/layout/Header.tsx
+
 'use client';
 
-// 修正 1: 从 import 中移除未使用的 'useEffect'
 import React, { useState } from 'react'; 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -80,7 +81,6 @@ export function Header() {
         {/* 桌面端导航 */}
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
           {navLinks.map((link) => 
-            // 修正 2: 对两种链接类型进行分别处理
             link.isDropdown ? (
               // 如果是下拉菜单
               <DropdownMenu key={link.label}>
@@ -102,7 +102,6 @@ export function Header() {
               // 如果是普通链接
               <Link
                 key={link.label}
-                // 这里的 link.href 是明确存在的
                 href={link.href}
                 className={cn(
                   "transition-colors hover:text-primary",
@@ -146,12 +145,10 @@ export function Header() {
                   {navLinks.flatMap(link => 
                     link.isDropdown ? [
                       <p key={link.label} className="px-4 pt-4 pb-2 font-semibold text-muted-foreground">{link.label}</p>,
-                      // 这里的 item.href 也是明确存在的
                       ...link.items.map(item => 
                         <Link key={item.label} href={item.href} onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-lg rounded-md hover:bg-accent">{item.label}</Link>
                       )
                     ] : [
-                      // 这里的 link.href 也是明确存在的
                       <Link key={link.label} href={link.href} onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-lg rounded-md hover:bg-accent">{link.label}</Link>
                     ]
                   )}

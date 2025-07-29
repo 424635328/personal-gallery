@@ -1,7 +1,8 @@
 // src/data/projects.ts
-// 项目数据及类型定义，包含项目信息和格式化工具
+
 import { format } from 'date-fns';
 
+/* 项目类型定义 */
 export interface Project {
   id: string;
   title: string;
@@ -14,6 +15,7 @@ export interface Project {
   client?: string;
 }
 
+/* 项目数据列表 */
 export const projects: Project[] = [
   {
     id: 'proj-01',
@@ -49,6 +51,7 @@ export const projects: Project[] = [
   },
 ];
 
+/* 日期格式化工具 */
 export const getFormattedDate = (dateString: string): string => {
   try {
     return format(new Date(dateString), 'yyyy年 M月');

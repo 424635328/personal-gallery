@@ -1,8 +1,9 @@
+// src/app/layout.tsx
+
 import type { Metadata } from 'next';
 import { Inter as FontSans, Playfair_Display, Nunito, Noto_Serif_SC, Poppins, VT323, Orbitron } from 'next/font/google';
 import { Suspense } from 'react';
 
-// 本地依赖和组件
 import { cn } from '@/lib/utils';
 import StyledComponentsRegistry from '@/lib/registry';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
@@ -15,7 +16,7 @@ import { NavigationEvents } from '@/components/layout/NavigationEvents';
 
 import './globals.css';
 
-// --- 字体定义 (不变) ---
+/* 字体定义 */
 const fontSans = FontSans({ subsets: ['latin'], variable: '--font-sans' });
 const fontSerif = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' });
 const fontDopamine = Nunito({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-dopamine' });
@@ -24,7 +25,7 @@ const fontSolarpunk = Poppins({ subsets: ['latin'], weight: ['400', '500', '600'
 const fontBrutalist = VT323({ subsets: ['latin'], weight: ['400'], variable: '--font-brutalist' });
 const fontNeon = Orbitron({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-neon' });
 
-// --- SEO 元数据 (不变) ---
+/* SEO 元数据 */
 export const metadata: Metadata = {
   title: {
     default: 'Personal Gallery',
@@ -33,14 +34,14 @@ export const metadata: Metadata = {
   description: '一个展示个人创意项目与技术实践的交互式作品集。',
 };
 
-// --- 根布局 (RootLayout) ---
+/* 根布局组件 - 应用主框架 */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // 关键点 1: <html> 标签设置为 h-full，让其高度与视口同步
+    /* 设置 html 高度为视口高度 */
     <html lang="zh-CN" suppressHydrationWarning className="h-full">
-      {/* 关键点 2: <body> 标签也设置为 h-full，并作为主 Flex 容器 */}
+      {/* body 作为主 Flex 容器 */}
       <body
         className={cn(
           'h-full bg-background font-sans antialiased',
@@ -62,30 +63,17 @@ export default function RootLayout({
           >
             <AuroraBackground neonSignText="Gallery" rainCount={40} />
 
-            {/* 关键点 3: 这个 div 是我们的主布局容器，设置为 flex 布局，并占据整个 body 高度 */}
+            {/* 主布局容器 - Flex 垂直布局 */}
             <div className="relative z-10 flex flex-col h-full">
               <Suspense fallback={null}>
                 <NProgressProvider>
-                  {/* Header 的高度由其内容决定 */}
                   <Header />
                   
-                  {/* --- 核心修改点 --- */}
-                  {/* 
-                    main 元素:
-                    1. flex-1: 自动填充 Header 和 Footer 之间的所有剩余垂直空间。
-                    2. overflow-hidden: 关键！这会隐藏任何超出其边界的内容，从而阻止滚动条的出现。
-                       为了让内容在 main 内部可以滚动（如果需要的话），可以改为 overflow-y-auto。
-                       但根据你的要求“不要自动生成页面滚动条”，我们使用 overflow-hidden。
-                  */}
+                  {/* 主内容区域 - 自动填充剩余空间 */}
                   <main className="flex-1 overflow-hidden">
                     {children}
                   </main>
                   
-                  {/* 
-                    Footer: 不再使用 fixed 定位。
-                    它会自然地被推到 Flex 容器的底部。
-                    其高度也由内容决定。
-                  */}
                   <Footer />
                 </NProgressProvider>
                 <NavigationEvents />

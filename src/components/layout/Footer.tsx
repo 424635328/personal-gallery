@@ -1,5 +1,5 @@
 // src/components/layout/Footer.tsx
-// 页面底部组件，包含社交链接和版权信息
+
 'use aclient';
 
 import React from 'react';

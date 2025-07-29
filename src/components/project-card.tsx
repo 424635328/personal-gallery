@@ -7,11 +7,11 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Calendar, User, CheckCircle, Clock, Archive } from 'lucide-react';
 import type { Project } from '@/data/projects';
-import { getFormattedDate } from '@/data/projects'; // 导入日期格式化函数
-import { Button } from '@/components/ui/button'; // 使用 Shadcn/UI 的 Button
+import { getFormattedDate } from '@/data/projects';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-// 小的内部组件，用于显示项目状态，代码更清晰
+/* 项目状态标签组件 */
 const StatusBadge = ({ status }: { status: Project['status'] }) => {
   const statusMap = {
     completed: { text: '已完成', icon: <CheckCircle className="h-3 w-3" />, color: 'text-green-400 bg-green-500/10' },
@@ -35,18 +35,15 @@ interface ProjectCardProps {
 export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <motion.div
-      // 动画：卡片出现时有轻微的浮动和淡入效果
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      // 样式：完全复刻效果图中的玻璃拟态风格
-      className="group w-full max-w-4xl grid md:grid-cols-2 items-center gap-8 md:gap-16
-                 bg-neutral-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/20"
+      className="group w-full max-w-4xl grid md:grid-cols-2 items-center gap-8 md:gap-16 bg-neutral-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/20"
     >
-      {/* 1. 作品图片部分 */}
+      {/* 作品图片部分 */}
       <motion.div
-        whileHover={{ scale: 1.03 }} // 悬浮时轻微放大
+        whileHover={{ scale: 1.03 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         className="relative aspect-[4/3] rounded-2xl overflow-hidden"
       >
@@ -54,14 +51,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
           src={project.imageUrl}
           alt={project.title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110" // 悬浮时图片也放大
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
           sizes="(max-width: 768px) 90vw, 40vw"
         />
-        {/* 图片遮罩层，增加质感 */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
       </motion.div>
 
-      {/* 2. 作品信息部分 */}
+      {/* 作品信息部分 */}
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between gap-4">
           <h3 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-300">
@@ -70,7 +66,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <StatusBadge status={project.status} />
         </div>
 
-        {/* 新增：客户与日期信息 */}
         <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
           {project.client && (
             <div className="flex items-center gap-1.5">
@@ -86,7 +81,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {project.description}
         </p>
 
-        {/* 标签 */}
+        {/* 标签列表 */}
         <div className="mt-6 flex flex-wrap gap-2">
           {project.tags.map((tag) => (
             <motion.span
@@ -99,7 +94,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           ))}
         </div>
 
-        {/* 外部链接按钮 (美化) */}
+        {/* 外部链接按钮 */}
         {project.link && (
           <Button asChild className="mt-8 w-fit group/button">
             <a
