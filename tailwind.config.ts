@@ -1,3 +1,5 @@
+// tailwind.config.ts
+
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 import tailwindcssAnimate from 'tailwindcss-animate';
