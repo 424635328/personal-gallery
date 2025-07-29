@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import StyledComponentsRegistry from '@/lib/registry';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
-import Header from '@/components/layout/Header';
+import Header from '@/components/layout/header/Header';
 import AuroraBackground from '@/components/layout/AuroraBackground';
 import NProgressProvider from '@/components/layout/NProgressProvider';
 import { Toaster } from '@/components/ui/sonner';
