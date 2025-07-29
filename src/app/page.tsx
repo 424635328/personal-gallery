@@ -40,7 +40,7 @@ export default function HomePage() {
     )}>
       
       {/* 2. 背景效果: 依然使用绝对定位，相对于主容器 */}
-      <div className="absolute top-0 left-0 -z-20 h-full w-full bg-background/55">
+      <div className="absolute top-0 left-0 -z-20 h-full w-full bg-background/15">
         <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[20%] translate-y-[20%] rounded-full bg-gradient-radial from-primary/10 via-transparent to-transparent opacity-50 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 right-auto top-auto h-[400px] w-[400px] -translate-x-[20%] -translate-y-[20%] rounded-full bg-gradient-radial from-purple-500/05 via-transparent to-transparent opacity-50 blur-3xl"></div>
       </div>
