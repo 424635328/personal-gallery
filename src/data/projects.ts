@@ -1,8 +1,7 @@
 // src/data/projects.ts
-
+// 项目数据及类型定义，包含项目信息和格式化工具
 import { format } from 'date-fns';
 
-// --- 1. 更新 Project 接口，添加新字段 ---
 export interface Project {
   id: string;
   title: string;
@@ -10,13 +9,11 @@ export interface Project {
   imageUrl: string;
   tags: string[];
   link?: string;
-  // --- 新增字段 ---
-  status: 'completed' | 'in-progress' | 'archived'; // 项目状态
-  date: string; // 项目完成或开始日期，格式：'YYYY-MM-DD'
-  client?: string; // 客户或项目类型，可选
+  status: 'completed' | 'in-progress' | 'archived';
+  date: string;
+  client?: string;
 }
 
-// --- 2. 更新你的作品列表，为每个项目添加新数据 ---
 export const projects: Project[] = [
   {
     id: 'proj-01',
@@ -25,7 +22,6 @@ export const projects: Project[] = [
     imageUrl: '/images/project-01.png',
     tags: ['React', 'Next.js', 'AI', 'Tailwind CSS'],
     link: 'https://github.com/424635328/personal-gallery',
-    // --- 添加新数据 ---
     status: 'completed',
     date: '2024-04-15',
     client: '个人项目'
@@ -37,7 +33,6 @@ export const projects: Project[] = [
     imageUrl: '/images/project-02.png',
     tags: ['Next.js', 'Recharts', 'Data-Viz'],
     link: 'https://github.com/424635328/personal-gallery',
-    // --- 添加新数据 ---
     status: 'archived',
     date: '2023-11-20',
     client: '概念验证'
@@ -48,24 +43,14 @@ export const projects: Project[] = [
     description: '一个展示个人作品的动态画廊，注重交互和动画效果，使用 Framer Motion 和玻璃拟态风格。',
     imageUrl: '/images/project-03.png',
     tags: ['Framer Motion', 'Next.js', 'TypeScript'],
-    // 这个项目没有 link，因为它就是当前网站
-    // --- 添加新数据 ---
     status: 'in-progress',
     date: '2024-05-20',
     client: '个人项目'
   },
 ];
 
-
-// --- 3. 新增辅助函数，供 ProjectCard 使用 ---
-/**
- * 将日期字符串 (如 '2024-05-20') 格式化为更易读的格式 (如 '2024年 5月')
- * @param dateString - 日期字符串
- * @returns 格式化后的日期字符串
- */
 export const getFormattedDate = (dateString: string): string => {
   try {
-    // 使用 date-fns 的 format 函数
     return format(new Date(dateString), 'yyyy年 M月');
   } catch {
     console.error("Invalid date string:", dateString);
