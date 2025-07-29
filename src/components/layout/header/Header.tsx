@@ -8,6 +8,8 @@ import Image from "next/image";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { Send } from "lucide-react";
 
+// 导入 toast 函数
+import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -37,6 +39,18 @@ export function Header() {
     setScrolled(latest > 50);
   });
 
+  // 1. 创建处理导航点击的函数
+  const handleNavigationStart = () => {
+    // 显示一个加载中的 toast，并获取其 ID
+    const toastId = toast.loading("正在加载页面...");
+    // 派发自定义事件，并将 toastId 放在 detail 中
+    window.dispatchEvent(
+      new CustomEvent('offerScoreNavigationStart', {
+        detail: { toastId },
+      })
+    );
+  };
+
   return (
     <motion.header
       className="sticky top-0 z-50 w-full border-b"
@@ -48,7 +62,12 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo Area */}
-          <Link href="/" className="flex items-center space-x-2.5 group">
+          <Link 
+            href="/" 
+            className="flex items-center space-x-2.5 group"
+            // 2. 将点击事件处理器添加到 Logo 链接
+            onClick={handleNavigationStart}
+          >
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -68,7 +87,8 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <DesktopNav />
+          {/* 3. 将处理器作为 prop 传递给导航组件 */}
+          <DesktopNav onLinkClick={handleNavigationStart} />
 
           {/* Right-side Actions */}
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -77,17 +97,20 @@ export function Header() {
             <Link
               href="/contact"
               className={cn(
-                buttonVariants({ variant: "default" }), // Changed to default for more prominence
+                buttonVariants({ variant: "default" }),
                 "hidden sm:flex items-center gap-2 group",
                 "transition-all duration-300 ease-out hover:shadow-lg hover:scale-105"
               )}
+              // 2. 将点击事件处理器添加到 “联系我” 链接
+              onClick={handleNavigationStart}
             >
               <Send className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-12" />
               联系我
             </Link>
 
             {/* Mobile Navigation Trigger */}
-            <MobileNav />
+            {/* 3. 将处理器作为 prop 传递给导航组件 */}
+            <MobileNav onLinkClick={handleNavigationStart} />
           </div>
         </div>
       </div>

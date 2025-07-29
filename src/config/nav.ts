@@ -1,32 +1,59 @@
 // src/config/nav.ts
 
-export type NavItem = {
-  href: string;
+import { Home, FolderGit2, Sparkles, User, Rss, LucideIcon } from "lucide-react";
+
+// ✨ 1. 定义更具体的类型，为 NavLink 和 NavItem 添加可选的 icon 属性
+export interface NavItem {
   label: string;
-  isDropdown?: false;
-};
+  href: string;
+  icon?: LucideIcon; // icon 是一个 Lucide 图标组件
+}
 
-export type DropdownItem = {
-  id: string; // Add an ID for keying and logic
-  label:string;
+export type NavLink = {
+  isDropdown: false;
+  label: string;
+  href: string;
+  icon?: LucideIcon;
+} | {
   isDropdown: true;
-  href?: undefined;
+  label: string;
   items: NavItem[];
+  icon?: LucideIcon;
 };
-
-export type NavLink = NavItem | DropdownItem;
 
 export const navLinks: NavLink[] = [
-  { href: "/", label: "首页" },
-  { href: "/projects", label: "我的作品" },
   {
-    id: "about",
-    label: "关于",
+    isDropdown: false,
+    label: "首页",
+    href: "/",
+    icon: Home,
+  },
+  {
+    isDropdown: false,
+    label: "我的作品",
+    href: "/projects",
+    icon: FolderGit2,
+  },
+  {
     isDropdown: true,
+    label: "关于",
+    icon: Sparkles,
     items: [
-      { href: "/about", label: "关于我" },
-      { href: "/blog", label: "我的博客" },
-      { href: "/skills", label: "技能栈" },
+      {
+        label: "关于我",
+        href: "/about",
+        icon: User,
+      },
+      {
+        label: "技能图谱",
+        href: "/skills",
+        icon: Sparkles,
+      },
+      {
+        label: "博客文章",
+        href: "/blog",
+        icon: Rss,
+      },
     ],
   },
 ];

@@ -1,5 +1,3 @@
-// src/components/layout/header/MobileNav.tsx
-
 "use client";
 
 import React, { useState } from "react";
@@ -12,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { navLinks } from "@/config/nav";
 import { cn } from "@/lib/utils";
 
+// 动画变体定义
 const itemVariants = {
   closed: { opacity: 0, y: 20 },
   open: { opacity: 1, y: 0 },
@@ -22,9 +21,22 @@ const listVariants = {
   open: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
 };
 
-export function MobileNav() {
+// 1. 定义 props 类型以接收点击处理器
+interface MobileNavProps {
+  onLinkClick: () => void;
+}
+
+// 2. 更新组件签名以接收 onLinkClick prop
+export function MobileNav({ onLinkClick }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+
+  // 3. 创建一个组合的点击处理函数
+  // 这个函数会先触发导航提示，然后关闭菜单
+  const handleLinkClick = () => {
+    onLinkClick();
+    setIsOpen(false);
+  };
 
   return (
     <div className="md:hidden">
@@ -56,7 +68,8 @@ export function MobileNav() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center p-6 border-b">
-                <Link href="/" onClick={() => setIsOpen(false)}>
+                {/* 4. 将新的点击处理器应用到 Logo 链接 */}
+                <Link href="/" onClick={handleLinkClick}>
                   <Image
                     src="/logo.svg"
                     alt="Logo"
@@ -92,9 +105,10 @@ export function MobileNav() {
                           <ul className="space-y-1 pl-4">
                             {link.items.map((item) => (
                               <motion.li key={item.href} variants={itemVariants}>
+                                {/* 4. 将新的点击处理器应用到下拉菜单链接 */}
                                 <Link
                                   href={item.href}
-                                  onClick={() => setIsOpen(false)}
+                                  onClick={handleLinkClick}
                                   className={cn(
                                     "block px-3 py-2 rounded-md text-lg",
                                     pathname === item.href
@@ -109,9 +123,10 @@ export function MobileNav() {
                           </ul>
                         </div>
                       ) : (
+                        // 4. 将新的点击处理器应用到标准链接
                         <Link
                           href={link.href}
-                          onClick={() => setIsOpen(false)}
+                          onClick={handleLinkClick}
                           className={cn(
                             "block px-3 py-2 rounded-md text-lg font-medium",
                             pathname === link.href
@@ -129,9 +144,10 @@ export function MobileNav() {
                   className="mt-8 pt-6 border-t"
                   variants={itemVariants}
                 >
+                  {/* 4. 将新的点击处理器应用到 “联系我” 链接 */}
                   <Link
                     href="/contact"
-                    onClick={() => setIsOpen(false)}
+                    onClick={handleLinkClick}
                     className={cn(
                       "w-full flex items-center justify-center gap-2",
                       "text-lg font-medium",

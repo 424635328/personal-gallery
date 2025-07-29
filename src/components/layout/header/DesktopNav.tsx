@@ -1,8 +1,6 @@
-// src/components/layout/header/DesktopNav.tsx
-
 "use client";
 
-import React, { useState } from "react";
+import React from "react"; // Removed useState as it's not used
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,13 +11,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { navLinks, NavLink } from "@/config/nav";
+import { navLinks } from "@/config/nav"; // Removed NavLink import as it's a type and not used as a value
 import { cn } from "@/lib/utils";
 
-export function DesktopNav() {
+// 1. Define props type to accept the click handler
+interface DesktopNavProps {
+  onLinkClick: () => void;
+}
+
+// 2. Update component signature to receive the onLinkClick prop
+export function DesktopNav({ onLinkClick }: DesktopNavProps) {
   const pathname = usePathname();
-  // We don't need hover state if we use layout animations on a shared element
-  // The magic happens with `layoutId`
 
   return (
     <nav className="hidden md:flex items-center space-x-2">
@@ -50,7 +52,10 @@ export function DesktopNav() {
                   >
                     {link.items.map((item) => (
                       <DropdownMenuItem key={item.href} asChild>
-                        <Link href={item.href}>{item.label}</Link>
+                        {/* 3. Add onClick handler to dropdown links */}
+                        <Link href={item.href} onClick={onLinkClick}>
+                          {item.label}
+                        </Link>
                       </DropdownMenuItem>
                     ))}
                   </motion.div>
@@ -58,8 +63,10 @@ export function DesktopNav() {
               </AnimatePresence>
             </DropdownMenu>
           ) : (
+            // 3. Add onClick handler to standard links
             <Link
               href={link.href}
+              onClick={onLinkClick}
               className={cn(
                 "px-4 py-2 rounded-md text-sm font-medium transition-colors",
                 "text-muted-foreground hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
