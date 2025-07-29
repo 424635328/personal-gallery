@@ -74,7 +74,7 @@ export function Header() {
               transition={{ type: "spring", stiffness: 300 }}
             >
               <Image
-                src="/logo.svg"
+                src="/logo.jpeg"
                 alt="Gallery Logo"
                 width={36}
                 height={36}
