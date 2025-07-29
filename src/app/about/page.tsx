@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Lightbulb, Code, Palette, Users, Briefcase, GraduationCap, Award } from 'lucide-react';
+import { Lightbulb, Code, Palette, Sparkles, Briefcase, GraduationCap, Award } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 

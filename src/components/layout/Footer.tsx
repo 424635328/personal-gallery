@@ -1,4 +1,4 @@
-'use client';
+'use aclient';
 
 import React from 'react';
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
@@ -24,16 +24,26 @@ export function Footer() {
   };
 
   return (
-    // 与 Header 保持一致的视觉风格
     <footer className={cn(
-      "w-full border-t border-border/20 bg-background/80 backdrop-blur-lg",
-      // 特定主题的微调
-      "theme-brutalist-glitch:border-foreground theme-brutalist-glitch:bg-background",
-      "theme-retro-pixel:border-foreground theme-retro-pixel:bg-background"
+      "w-full border-t", // 基础样式
+
+      // --- 核心修改点: 默认/通用主题的毛玻璃效果 ---
+      // 将效果放在这里，作为基础样式
+      "border-border/20 bg-background/80 backdrop-blur-lg",
+      
+      // --- 特定主题的样式覆盖 ---
+      // 对于风格强烈的“粗野主义”和“复古像素”主题:
+      // 移除模糊效果，使用不透明背景和更硬朗的边框，以保持风格统一。
+      "theme-brutalist-glitch:bg-background theme-brutalist-glitch:border-foreground theme-brutalist-glitch:backdrop-blur-none",
+      "theme-retro-pixel:bg-background theme-retro-pixel:border-foreground theme-retro-pixel:backdrop-blur-none",
+      
+      // 对于“暖阳工坊”和“禅意水墨”等可能带有纹理的主题:
+      // 移除模糊，让背景纹理更清晰可见。
+      "theme-warm-sunshine:bg-background/95 theme-warm-sunshine:backdrop-blur-none",
+      "theme-zen-ink:bg-background/95 theme-zen-ink:backdrop-blur-none"
     )}>
-      <div className="container mx-auto px-4 py-1">
-        {/* --- 核心修改: 采用居中布局，更简洁现代 --- */}
-        <div className="flex flex-col items-center space-y-2">
+      <div className="container mx-auto px-4 py-4"> {/* 使用了更紧凑的 py-4 */}
+        <div className="flex flex-col items-center space-y-3"> {/* 稍微增加间距 */}
           
           {/* 社交链接 */}
           <div className="flex items-center space-x-6">
@@ -46,11 +56,9 @@ export function Footer() {
                 rel="noopener noreferrer"
                 aria-label={link.name}
                 title={link.name}
-                // --- 交互优化: 添加 hover 效果 ---
                 className="text-muted-foreground transition-all hover:text-primary hover:scale-110"
               >
-                {/* 统一图标大小 */}
-                {React.cloneElement(link.icon, { className: 'h-6 w-6' })}
+                {React.cloneElement(link.icon, { className: 'h-5 w-5' })} {/* 使用了更小巧的图标 h-5 w-5 */}
               </a>
             ))}
           </div>
