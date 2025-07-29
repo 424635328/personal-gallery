@@ -1,6 +1,6 @@
 // src/components/layout/Footer.tsx
 
-'use aclient';
+'use client';
 
 import React from 'react';
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react';

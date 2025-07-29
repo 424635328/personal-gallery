@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Menu, X, ChevronDown, Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,18 +19,17 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from './ThemeToggle';
 import { cn } from '@/lib/utils';
 
-// --- 结构化的导航数据 ---
-// 定义更精确的类型，以帮助 TypeScript 理解数据结构
+// --- 结构化的导航数据  ---
 type NavItem = {
   href: string;
   label: string;
-  isDropdown?: false; // 明确普通链接没有 isDropdown
+  isDropdown?: false;
 };
 
 type DropdownItem = {
   label: string;
   isDropdown: true;
-  href?: undefined; // 明确下拉菜单父项没有 href
+  href?: undefined;
   items: NavItem[];
 };
 
@@ -44,8 +43,8 @@ const navLinks: NavLink[] = [
     isDropdown: true,
     items: [
       { href: '/about', label: '关于我' },
-      { href: '/#', label: '我的博客' }, // 占位符
-      { href: '/#', label: '技能栈' }, // 占位符
+      { href: '/#', label: '我的博客' },
+      { href: '/#', label: '技能栈' },
     ],
   },
 ];
@@ -56,7 +55,6 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // 滚动感知逻辑
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 10);
   });
@@ -72,34 +70,32 @@ export function Header() {
     >
       <div className="container flex h-16 items-center">
         
-        {/* Logo */}
         <Link href="/" className="mr-8 flex items-center space-x-2">
           <Image src="/logo.svg" alt="Logo" width={28} height={28} className="h-7 w-7" />
           <span className="text-xl font-semibold">Gallery</span>
         </Link>
         
-        {/* 桌面端导航 */}
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
           {navLinks.map((link) => 
             link.isDropdown ? (
-              // 如果是下拉菜单
               <DropdownMenu key={link.label}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-1 text-muted-foreground hover:text-primary">
-                    {link.label} <ChevronDown className="h-4 w-4" />
-                  </Button>
+                <DropdownMenuTrigger
+                  className={cn(
+                    buttonVariants({ variant: 'ghost' }),
+                    "flex items-center gap-1 text-muted-foreground hover:text-primary"
+                  )}
+                >
+                  {link.label} <ChevronDown className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {link.items.map(item => (
                     <DropdownMenuItem key={item.label} asChild>
-                      {/* 这里的 item.href 是明确存在的 */}
                       <Link href={item.href}>{item.label}</Link>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              // 如果是普通链接
               <Link
                 key={link.label}
                 href={link.href}
@@ -114,16 +110,18 @@ export function Header() {
           )}
         </nav>
 
-        {/* 右侧操作区 */}
         <div className="ml-auto flex items-center space-x-2">
           <ThemeToggle />
-          <Button asChild className="hidden sm:inline-flex">
-            <Link href="/contact">
-              <Send className="mr-2 h-4 w-4" /> 联系我
-            </Link>
-          </Button>
+          <Link
+            href="/contact"
+            className={cn(
+              buttonVariants({}),
+              "hidden sm:inline-flex"
+            )}
+          >
+            <Send className="mr-2 h-4 w-4" /> 联系我
+          </Link>
           
-          {/* 移动端菜单 */}
           <div className="md:hidden">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -154,9 +152,16 @@ export function Header() {
                   )}
                 </nav>
                 <div className="absolute bottom-8 left-0 right-0 px-8">
-                  <Button asChild className="w-full">
-                    <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>联系我</Link>
-                  </Button>
+                  <Link
+                    href="/contact"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      buttonVariants({}),
+                      "w-full"
+                    )}
+                  >
+                    联系我
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>
