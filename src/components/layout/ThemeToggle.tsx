@@ -37,6 +37,9 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
+
+        {/* 暂时未完成主题适配 */}
+
         {/* <Button variant="ghost" size="icon">
           <Palette className="h-[1.2rem] w-[1.2rem] transition-all" />
           <span className="sr-only">Toggle theme</span>
