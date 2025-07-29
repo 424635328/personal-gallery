@@ -16,9 +16,9 @@ import { MobileNav } from "./MobileNav";
 
 const headerVariants = {
   top: {
-    backgroundColor: "rgba(255, 255, 255, 0)", // or your theme's transparent color
+    backgroundColor: "rgba(255, 255, 255, 0.05)", 
     backdropFilter: "blur(0px)",
-    borderColor: "rgba(231, 231, 231, 0)", // or your border color with 0 alpha
+    borderColor: "rgba(231, 231, 231, 0)", 
     boxShadow: "0 0 0 0 rgba(0,0,0,0)",
   },
   scrolled: {

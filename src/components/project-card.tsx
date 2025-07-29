@@ -2,16 +2,26 @@
 
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { ArrowUpRight, Calendar, User, CheckCircle, Clock, Archive } from 'lucide-react';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import {
+  ArrowUpRight,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Archive,
+  Star,
+  Github,
+  Globe,
+  Briefcase,
+} from 'lucide-react';
 import type { Project } from '@/data/projects';
 import { getFormattedDate } from '@/data/projects';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
-/* 项目状态标签组件 */
 const StatusBadge = ({ status }: { status: Project['status'] }) => {
   const statusMap = {
     completed: { text: '已完成', icon: <CheckCircle className="h-3 w-3" />, color: 'text-green-400 bg-green-500/10' },
@@ -21,93 +31,137 @@ const StatusBadge = ({ status }: { status: Project['status'] }) => {
   const currentStatus = statusMap[status];
 
   return (
-    <div className={cn("flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full", currentStatus.color)}>
+    <div className={cn("flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full shrink-0", currentStatus.color)}>
       {currentStatus.icon}
       <span>{currentStatus.text}</span>
     </div>
   );
 };
 
+// 按钮组件，用于源码和在线预览链接
+const ActionButton = ({ href, icon, text }: { href: string; icon: React.ReactNode; text: string }) => (
+  <Button asChild variant="secondary" size="sm">
+    <Link href={href} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+      {icon}
+      <span>{text}</span>
+    </Link>
+  </Button>
+);
+
 interface ProjectCardProps {
   project: Project;
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 100, damping: 20 };
+  const smoothMouseX = useSpring(mouseX, springConfig);
+  const smoothMouseY = useSpring(mouseY, springConfig);
+
+  const rotateX = useTransform(smoothMouseY, [-0.5, 0.5], ['6deg', '-6deg']);
+  const rotateY = useTransform(smoothMouseX, [-0.5, 0.5], ['-6deg', '6deg']);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    mouseX.set((e.clientX - left) / width - 0.5);
+    mouseY.set((e.clientY - top) / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  const hasLink = project.liveUrl || project.sourceUrl;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="group w-full max-w-4xl grid md:grid-cols-2 items-center gap-8 md:gap-16 bg-neutral-900/40 backdrop-blur-md border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/20"
+    <div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="group relative w-full max-w-5xl aspect-[16/9] md:aspect-[2/1] cursor-pointer"
+      // 使用 onClick 导航，让整个卡片都可点击 (如果只有一个链接)
+      onClick={() => {
+        if (project.liveUrl) window.open(project.liveUrl, '_blank');
+        else if (project.sourceUrl) window.open(project.sourceUrl, '_blank');
+      }}
     >
-      {/* 作品图片部分 */}
       <motion.div
-        whileHover={{ scale: 1.03 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        className="relative aspect-[4/3] rounded-2xl overflow-hidden"
+        style={{ transformStyle: 'preserve-3d', rotateX, rotateY }}
+        className="relative w-full h-full rounded-3xl bg-card border border-border/60 shadow-lg transition-shadow duration-300 group-hover:shadow-2xl group-hover:shadow-primary/20"
       >
-        <Image
-          src={project.imageUrl}
-          alt={project.title}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-          sizes="(max-width: 768px) 90vw, 40vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-      </motion.div>
+        {/* 辉光效果 */}
+        <div className="absolute inset-0 rounded-3xl border-2 border-primary/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ transform: 'translateZ(30px)' }} />
 
-      {/* 作品信息部分 */}
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between gap-4">
-          <h3 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-300">
-            {project.title}
-          </h3>
-          <StatusBadge status={project.status} />
-        </div>
+        {/* 内容区 */}
+        <div className="p-8 md:p-10 flex flex-col md:flex-row gap-8 w-full h-full" style={{ transform: 'translateZ(50px)' }}>
+          {/* 左侧图片 */}
+          <div className="md:w-[45%] h-1/2 md:h-full relative rounded-2xl overflow-hidden shadow-md border border-border/50 shrink-0">
+            <Image
+              src={project.imageUrl}
+              alt={project.title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 90vw, 40vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent" />
+          </div>
 
-        <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
-          {project.client && (
-            <div className="flex items-center gap-1.5">
-              <User className="h-4 w-4" /> <span>{project.client}</span>
+          {/* 右侧信息 */}
+          <div className="md:w-[55%] h-1/2 md:h-full flex flex-col">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-card-foreground tracking-tight">
+                  {project.title}
+                </h3>
+                <p className="text-sm text-primary font-medium mt-1">{project.subtitle}</p>
+              </div>
+              <StatusBadge status={project.status} />
             </div>
-          )}
-          <div className="flex items-center gap-1.5">
-            <Calendar className="h-4 w-4" /> <span>{getFormattedDate(project.date)}</span>
+
+            <div className="mt-4 flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              {project.client && (
+                <div className="flex items-center gap-1.5"><Briefcase className="h-3 w-3" /><span>{project.client}</span></div>
+              )}
+              <div className="flex items-center gap-1.5"><Calendar className="h-3 w-3" /><span>{getFormattedDate(project.date)}</span></div>
+            </div>
+            
+            {/* 核心亮点 */}
+            <div className="mt-5 space-y-2 text-sm text-muted-foreground">
+              {project.highlights.map((highlight, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <Star className="h-4 w-4 text-primary/80 mt-0.5 shrink-0" />
+                  <span>{highlight}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* 底部区域: 技术标签和操作按钮 */}
+            <div className="mt-auto pt-4 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <span key={tag} className="px-2.5 py-1 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center gap-3">
+                {project.liveUrl && <ActionButton href={project.liveUrl} icon={<Globe className="h-4 w-4 mr-1.5" />} text="在线体验" />}
+                {project.sourceUrl && <ActionButton href={project.sourceUrl} icon={<Github className="h-4 w-4 mr-1.5" />} text="查看源码" />}
+              </div>
+            </div>
           </div>
         </div>
-
-        <p className="mt-4 text-neutral-300 flex-grow">
-          {project.description}
-        </p>
-
-        {/* 标签列表 */}
-        <div className="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <motion.span
-              key={tag}
-              whileHover={{ y: -2 }}
-              className="px-3 py-1 text-sm bg-white/10 text-neutral-300 rounded-full cursor-pointer"
-            >
-              {tag}
-            </motion.span>
-          ))}
-        </div>
-
-        {/* 外部链接按钮 */}
-        {project.link && (
-          <Button asChild className="mt-8 w-fit group/button">
-            <a
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              访问项目
-              <ArrowUpRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover/button:rotate-45" />
-            </a>
-          </Button>
+        
+        {hasLink && (
+            <ArrowUpRight className="absolute top-6 right-6 h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ transform: 'translateZ(80px)' }} />
         )}
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

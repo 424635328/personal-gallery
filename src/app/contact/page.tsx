@@ -1,128 +1,123 @@
 // src/app/contact/page.tsx
-
 'use client';
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Github, Linkedin, Twitter, Copy } from 'lucide-react';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Github, Linkedin, Mail, MessageSquarePlus, ExternalLink } from 'lucide-react';
 
-// --- 动画变体 ---
-const containerVariants = {
-  hidden: { opacity: 0 },
+// 动画变体
+const fadeIn = (delay: number) => ({
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay } },
+});
+
+const staggerContainer = {
+  hidden: {},
   visible: {
-    opacity: 1,
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
+      staggerChildren: 0.15,
     },
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
-};
-
-// --- 联系方式数据 ---
-const contactMethods = [
-  {
-    icon: <Mail className="h-8 w-8 text-primary" />,
-    title: '电子邮件',
-    description: '进行项目咨询或深入讨论的最佳方式。',
-    value: 'your-email@example.com', // <-- 替换为你的邮箱
-    isCopyable: true,
-  },
-  {
-    icon: <Github className="h-8 w-8" />,
-    title: 'GitHub',
-    description: '查看我的开源项目和代码贡献。',
-    value: 'https://github.com/424635328/personal-gallery',
-    isCopyable: false,
-  },
-  {
-    icon: <Linkedin className="h-8 w-8" />,
-    title: 'LinkedIn',
-    description: '了解我的专业背景和职业网络。',
-    value: '#', // <-- 替换为你的LinkedIn主页链接
-    isCopyable: false,
-  },
-  {
-    icon: <Twitter className="h-8 w-8" />,
-    title: 'Twitter / X',
-    description: '关注我的日常分享和技术见解。',
-    value: '#', // <-- 替换为你的Twitter主页链接
-    isCopyable: false,
-  },
-];
+// 定义一个可复用的联系方式卡片组件
+const ContactCard = ({
+  icon,
+  title,
+  content,
+  href,
+  isPrimary = false,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  content: string;
+  href: string;
+  isPrimary?: boolean;
+}) => (
+  <motion.div variants={fadeIn(0.2)}>
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={
+        isPrimary
+          ? "block p-8 rounded-xl bg-primary/10 border-2 border-primary/50 shadow-lg hover:shadow-primary/20 transition-all transform hover:-translate-y-1"
+          : "block p-6 rounded-xl bg-card/50 border border-border/50 hover:bg-primary/5 hover:border-primary/30 transition-all"
+      }
+    >
+      <div className="flex items-start gap-4">
+        <div className={isPrimary ? "text-primary" : "text-muted-foreground"}>{icon}</div>
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-foreground">{title}</h3>
+          <p className="mt-1 text-muted-foreground">{content}</p>
+          <div className="mt-4 flex items-center text-sm font-medium text-primary">
+            {isPrimary ? '前往创建 Issue' : '立即联系'}
+            <ExternalLink className="ml-1.5 h-4 w-4" />
+          </div>
+        </div>
+      </div>
+    </Link>
+  </motion.div>
+);
 
 export default function ContactPage() {
-
-  // 点击复制邮箱的函数
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success('邮箱地址已复制到剪贴板！');
-  };
+  const issuesUrl = "https://github.com/424635328/personal-gallery/issues/new/choose";
 
   return (
-    <div className="container mx-auto px-4 py-24 sm:py-32">
+    <div className="h-full w-full overflow-y-auto px-4 sm:px-8 md:px-16 lg:px-24 py-12">
       <motion.div
+        className="max-w-4xl mx-auto"
         initial="hidden"
         animate="visible"
-        variants={containerVariants}
-        className="max-w-4xl mx-auto"
+        variants={staggerContainer}
       >
-        {/* 1. 页面标题和介绍 */}
-        <div className="text-center mb-16">
-          <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl font-bold text-foreground">
+        <motion.div variants={fadeIn(0)} className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter text-foreground">
             保持联系
-          </motion.h1>
-          <motion.p variants={itemVariants} className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            我总是乐于接受新的挑战和合作机会。无论您是有项目想法，还是只想聊聊技术与设计，都欢迎随时与我联系。
-          </motion.p>
-        </div>
+          </h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            我乐于接收任何形式的反馈、建议或合作机会。最高效的交流方式是通过 GitHub Issues，期待您的声音。
+          </p>
+        </motion.div>
 
-        {/* 2. 联系方式网格 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {contactMethods.map((method, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              whileHover={{ y: -5, transition: { type: 'spring', stiffness: 300 } }}
-            >
-              <div className="group h-full p-8 rounded-2xl bg-black/20 border border-neutral-800 transition-all duration-300 hover:border-primary/50 hover:bg-black/40">
-                <div className="flex items-start justify-between">
-                  {method.icon}
-                  {method.isCopyable ? (
-                    <button
-                      onClick={() => handleCopy(method.value)}
-                      className="p-2 rounded-full text-muted-foreground bg-neutral-800/50 transition-all hover:bg-primary/20 hover:text-primary"
-                      aria-label="复制"
-                      title="复制"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </button>
-                  ) : (
-                    <a href={method.value} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full text-muted-foreground transition-all">
-                      {/* 占位符，使布局统一 */}
-                    </a>
-                  )}
-                </div>
-                <h3 className="mt-4 text-2xl font-semibold text-foreground">{method.title}</h3>
-                <p className="mt-2 text-muted-foreground">{method.description}</p>
-                
-                {method.isCopyable ? (
-                  <p className="mt-4 font-mono text-sm text-primary break-all cursor-pointer" onClick={() => handleCopy(method.value)}>
-                    {method.value}
-                  </p>
-                ) : (
-                  <a href={method.value} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-sm text-primary hover:underline">
-                    访问链接
-                  </a>
-                )}
-              </div>
-            </motion.div>
-          ))}
+        {/* 主要行动号召：GitHub Issues */}
+        <ContactCard
+          isPrimary
+          icon={<MessageSquarePlus className="h-8 w-8" />}
+          title="建议、Bug反馈或任何想法？"
+          content="欢迎在本项目的 GitHub Issues 页面提出。无论是功能建议、发现的Bug，还是单纯想讨论技术，这里都是最佳的交流平台。"
+          href={issuesUrl}
+        />
+        
+        <motion.div variants={fadeIn(0.4)} className="my-12 flex items-center justify-center gap-4">
+            <div className="h-px flex-1 bg-border"></div>
+            <span className="text-muted-foreground text-sm">或者，通过其他方式联系我</span>
+            <div className="h-px flex-1 bg-border"></div>
+        </motion.div>
+
+        {/* 其他联系方式 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ContactCard
+                icon={<Mail className="h-6 w-6"/>}
+                title="电子邮件"
+                content="对于私人或紧急事宜，您可以通过邮件联系我。"
+                href="mailto:424635328@qq.com"
+            />
+            <ContactCard
+                icon={<Linkedin className="h-6 w-6"/>}
+                title="LinkedIn"
+                content="关注我的职业动态，或通过平台发送商务合作邀请。"
+                href="https://www.linkedin.com/in/tony-zhang-dev"
+            />
+            {/* 可以保留 GitHub 主页链接，作为个人品牌的展示 */}
+            <ContactCard
+                icon={<Github className="h-6 w-6"/>}
+                title="GitHub 主页"
+                content="探索我的其他开源项目和代码贡献。"
+                href="https://github.com/424635328"
+            />
         </div>
       </motion.div>
     </div>

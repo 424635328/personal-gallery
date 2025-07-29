@@ -17,15 +17,14 @@ const fadeIn = {
 export default function ProjectsPage() {
   return (
     // 1. 让 main 成为一个占据所有可用空间的滚动容器
-    // h-full: 继承父级 flex-1 的高度
-    // overflow-y-scroll: 允许 main 自身滚动
     <main className="h-full w-full snap-y snap-mandatory overflow-y-scroll">
       
       {projects.map((project) => (
         <section
           key={project.id}
           // 2. 每个 section 的高度就是其父容器 (main) 的高度
-          className="h-full w-full snap-start flex items-center justify-center px-4 sm:px-8"
+          // CHANGE: 增加了内边距 (padding), 为更大的卡片提供更多呼吸空间
+          className="h-full w-full snap-start flex items-center justify-center p-4 sm:p-8 md:p-12"
         >
           <ProjectCard project={project} />
         </section>

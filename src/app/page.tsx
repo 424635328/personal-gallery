@@ -124,7 +124,7 @@ export default function HomePage() {
               <Send className="mr-2 h-5 w-5" />
               联系我
             </Link>
-          </motion.div>
+          </motion.div> 
         </motion.div>
       </div>
     </div>
