@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import StyledComponentsRegistry from '@/lib/registry';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import AuroraBackground from '@/components/layout/AuroraBackground';
 import NProgressProvider from '@/components/layout/NProgressProvider';
 import { Toaster } from '@/components/ui/sonner';
@@ -74,7 +73,6 @@ export default function RootLayout({
                     {children}
                   </main>
                   
-                  <Footer />
                 </NProgressProvider>
                 <NavigationEvents />
               </Suspense>
