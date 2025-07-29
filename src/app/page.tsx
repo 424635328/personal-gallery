@@ -1,103 +1,122 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React from 'react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { ArrowDown, Code, PenTool, Sparkles, Send } from 'lucide-react';
+
+// --- 动画变体 (保持不变) ---
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    // 1. 主容器: 占据父级(main)的所有空间，并成为新的 Flex 容器
+    <div className={cn(
+      "w-full h-full flex flex-col items-center justify-center text-center relative overflow-hidden px-4",
+      "font-sans",
+      // ... (所有主题字体类名保持不变)
+      "theme-warm-sunshine:font-serif", "theme-dopamine-pop:font-dopamine", "theme-zen-ink:font-sans",
+      "theme-solarpunk-utopia:font-solarpunk", "theme-rustic-artisan:font-artisan",
+      "theme-brutalist-glitch:font-brutalist theme-brutalist-glitch:uppercase",
+      "theme-retro-pixel:font-brutalist theme-retro-pixel:uppercase", "theme-acid-wave:font-sans theme-acid-wave:uppercase"
+    )}>
+      
+      {/* 2. 背景效果: 依然使用绝对定位，相对于主容器 */}
+      <div className="absolute top-0 left-0 -z-20 h-full w-full bg-background/55">
+        <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[20%] translate-y-[20%] rounded-full bg-gradient-radial from-primary/10 via-transparent to-transparent opacity-50 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 right-auto top-auto h-[400px] w-[400px] -translate-x-[20%] -translate-y-[20%] rounded-full bg-gradient-radial from-purple-500/05 via-transparent to-transparent opacity-50 blur-3xl"></div>
+      </div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-6xl h-48 -z-10 bg-gradient-to-r from-blue-500/50 via-purple-500/50 to-indigo-500/50 opacity-20 blur-3xl animate-[aurora_12s_ease-in-out_infinite_alternate]" />
+        
+      {/* 3. 内容层: 所有内容都放在这里 */}
+      <div className="relative z-10">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="space-y-6"
+        >
+          <motion.div variants={fadeIn} className={cn("inline-block rounded-full px-4 py-1.5 text-sm font-medium", "bg-neutral-800/60 border border-neutral-700 text-neutral-300")}>
+            Tony.PGL
+          </motion.div>
+          
+          <motion.h1 variants={fadeIn} className={cn(
+              "text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl",
+              "text-neutral-800", 
+              "dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:via-purple-500 dark:to-pink-500",
+              "dark:animate-aurora dark:[background-size:200%_200%]"
+            )}>
+            用代码与设计，塑造交互新体验
+          </motion.h1>
+        </motion.div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        {/* 核心能力卡片 */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={staggerContainer}
+          className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3 max-w-4xl"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          {[
+            { icon: <Code className="h-6 w-6 text-neutral-400 group-hover:text-white transition-colors" />, title: "前端开发", description: "精通现代前端技术栈，构建高性能应用。" },
+            { icon: <PenTool className="h-6 w-6 text-neutral-400 group-hover:text-white transition-colors" />, title: "UI/UX 设计", description: "注重用户体验，打造直观优雅的界面。" },
+            { icon: <Sparkles className="h-6 w-6 text-neutral-400 group-hover:text-white transition-colors" />, title: "创意交互", description: "热衷于通过动效为产品注入生命力。" },
+          ].map((feature, index) => (
+            <motion.div key={index} variants={fadeIn} whileHover={{ y: -5, transition: { type: 'spring', stiffness: 400, damping: 20 } }}>
+              <div className={cn("group flex h-full flex-col items-center justify-center text-center gap-4 rounded-2xl p-8 transition-all duration-300", "bg-black/30 border border-neutral-800 hover:border-neutral-700 hover:bg-black/50")}>
+                {feature.icon}
+                <div>
+                  <h3 className="font-semibold text-neutral-200">{feature.title}</h3>
+                  <p className="mt-1 text-sm text-neutral-400">{feature.description}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* 行动号召按钮 */}
+        <motion.div
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.6 }}
+          className="mt-12 flex flex-wrap justify-center gap-4"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button size="lg" asChild className="bg-white text-black hover:bg-neutral-200">
+              <Link href="/projects">
+                <ArrowDown className="mr-2 h-5 w-5" />
+                查看我的作品
+              </Link>
+            </Button>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button size="lg" variant="ghost" asChild className="hover:bg-white/10 hover:text-white">
+              <Link href="/contact">
+                <Send className="mr-2 h-5 w-5" />
+                联系我
+              </Link>
+            </Button>
+          </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }
