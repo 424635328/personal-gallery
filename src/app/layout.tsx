@@ -51,7 +51,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="theme-acid-wave"
             themes={[
               'dark', 'theme-midnight-grimoire', 'theme-warm-sunshine', 'theme-dopamine-pop',
               'theme-zen-ink', 'theme-solarpunk-utopia', 'theme-rustic-artisan',

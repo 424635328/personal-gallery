@@ -40,10 +40,10 @@ export function ThemeToggle() {
 
         {/* 暂时未完成主题适配 */}
 
-        {/* <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon">
           <Palette className="h-[1.2rem] w-[1.2rem] transition-all" />
           <span className="sr-only">Toggle theme</span>
-        </Button> */}
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>选择一个视觉主题</DropdownMenuLabel>
