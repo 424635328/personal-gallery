@@ -1,5 +1,6 @@
 # .github/workflows/auto-dependabot.yml
 # “天文台”模式终极工作流，用于全自动处理 Dependabot PR。
+# 经过健壮性优化，包含严格模式、依赖检查和详细日志。
 
 name: Dependabot Observatory
 
@@ -11,6 +12,7 @@ on:
 
 jobs:
   handle_dependabot_pr:
+    # 确保是由 dependabot 触发，并且确实关联了一个 PR
     if: >
       github.event.workflow_run.actor.login == 'dependabot[bot]' &&
       github.event.workflow_run.pull_requests[0]
@@ -19,41 +21,72 @@ jobs:
       pull-requests: write
       contents: write
       statuses: read
-      # 读取分支保护规则所需的权限已由 'contents: write' (包含读) 提供。
 
     steps:
-      - name: Extract PR Information
+      - name: "Setup: Verify Dependencies"
+        run: |
+          set -euo pipefail
+          echo "Checking for required tools..."
+          gh --version
+          jq --version
+          echo "✅ All dependencies are available."
+
+      - name: "Step 1: Extract PR Information"
         id: pr-info
         run: |
-          echo "pr_number=${{ github.event.workflow_run.pull_requests[0].number }}" >> $GITHUB_OUTPUT
-          # 修正点：直接获取 headRefOid 字段，而不是通过不存在的 headRef 对象
-          PR_HEAD_SHA=$(gh pr view ${{ github.event.workflow_run.pull_requests[0].number }} --json headRefOid --jq '.headRefOid')
+          set -euo pipefail
+          echo "🔍 Extracting PR information from workflow run..."
+          
+          # 从事件上下文中获取 PR 编号
+          PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number }}"
+          if [ -z "$PR_NUMBER" ]; then
+            echo "❌ ERROR: Could not find an associated PR number."
+            exit 1
+          fi
+          echo "PR Number: $PR_NUMBER"
+          
+          # 使用 gh cli 获取 PR 的 head SHA 和 base branch
+          # 注意：所有变量引用都使用双引号，增强健壮性
+          echo "Fetching PR details using GitHub CLI..."
+          PR_HEAD_SHA=$(gh pr view "$PR_NUMBER" --json headRefOid --jq '.headRefOid')
+          BASE_BRANCH=$(gh pr view "$PR_NUMBER" --json baseRefName --jq '.baseRefName')
+
+          echo "PR Head SHA: $PR_HEAD_SHA"
+          echo "Base Branch: $BASE_BRANCH"
+
+          # 将提取的信息输出给后续步骤使用
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
           echo "pr_head_sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
-          BASE_BRANCH=$(gh pr view ${{ github.event.workflow_run.pull_requests[0].number }} --json baseRefName --jq '.baseRefName')
           echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Observatory: Check against Branch Protection Rules"
+      - name: "Step 2: Observatory - Check Branch Protection Rules"
         id: observatory
         run: |
-          echo "Observing PR #${{ steps.pr-info.outputs.pr_number }} for branch '${{ steps.pr-info.outputs.base_branch }}'..."
+          set -euo pipefail
+          echo "🔭 Observing PR #${{ steps.pr-info.outputs.pr_number }} for branch '${{ steps.pr-info.outputs.base_branch }}'..."
           
-          REQUIRED_CHECKS=$(gh api "repos/${{ github.repository }}/branches/${{ steps.pr-info.outputs.base_branch }}/protection" --jq '.required_status_checks.contexts[]' | jq -r 'select(. != null)')
+          echo "Fetching branch protection rules..."
+          REQUIRED_CHECKS=$(gh api "repos/${{ github.repository }}/branches/${{ steps.pr-info.outputs.base_branch }}/protection" --jq '.required_status_checks.contexts[]' | jq -r 'select(. != null)' || true)
+          
           if [ -z "$REQUIRED_CHECKS" ]; then
             echo "✅ No required status checks found in branch protection rules. Gatekeeper passes by default."
             echo "observatory_passed=true" >> $GITHUB_OUTPUT
             exit 0
           fi
+          
           echo "Required checks according to branch protection rules:"
           echo "$REQUIRED_CHECKS"
 
+          echo "Fetching actual check runs for commit: ${{ steps.pr-info.outputs.pr_head_sha }}"
           ALL_CHECKS_JSON=$(gh api "repos/${{ github.repository }}/commits/${{ steps.pr-info.outputs.pr_head_sha }}/check-runs" --jq '.check_runs[] | {name: .name, conclusion: .conclusion}')
           echo "Actual checks found on commit:"
           echo "$ALL_CHECKS_JSON"
 
           ALL_PASS=true
           while IFS= read -r CHECK_NAME; do
+            # 使用 jq 的 --arg 来安全地传递变量
             CONCLUSION=$(echo "$ALL_CHECKS_JSON" | jq -r --arg name "$CHECK_NAME" 'select(.name == $name) | .conclusion')
             
             if [[ "$CONCLUSION" == "success" ]]; then
@@ -65,47 +98,55 @@ jobs:
           done <<< "$REQUIRED_CHECKS"
           
           if $ALL_PASS; then
+            echo "Final Result: All required checks passed."
             echo "observatory_passed=true" >> $GITHUB_OUTPUT
           else
+            echo "Final Result: One or more required checks failed or are pending."
             echo "observatory_passed=false" >> $GITHUB_OUTPUT
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Get Dependabot metadata
+      - name: "Step 3: Get Dependabot Metadata"
         id: dependabot-metadata
         if: steps.observatory.outputs.observatory_passed == 'true'
         uses: dependabot/fetch-metadata@v2.2.0
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Handle successful checks (non-major update)
+      - name: "Step 4: Handle Successful Checks (Non-Major Update)"
         if: >
           steps.observatory.outputs.observatory_passed == 'true' &&
           steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
         run: |
-          echo "Observatory reports all checks passed for a non-major update. Enabling auto-merge."
-          gh pr merge ${{ steps.pr-info.outputs.pr_number }} --auto --squash
+          set -euo pipefail
+          echo "✅ Observatory reports all checks passed for a non-major update."
+          echo "Enabling auto-merge for PR #${{ steps.pr-info.outputs.pr_number }}..."
+          gh pr merge "${{ steps.pr-info.outputs.pr_number }}" --auto --squash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Handle successful checks (major update)
+      - name: "Step 5: Handle Successful Checks (Major Update)"
         if: >
           steps.observatory.outputs.observatory_passed == 'true' &&
           steps.dependabot-metadata.outputs.update-type == 'version-update:semver-major'
         run: |
-          echo "Observatory reports all checks passed for a major update. Manual review is required."
-          gh pr comment ${{ steps.pr-info.outputs.pr_number }} --body "✅ The Observatory confirms all required branch protection checks have passed, but this is a **major** version update. It requires manual review and approval."
+          set -euo pipefail
+          echo "⚠️ Observatory reports all checks passed, but this is a major update."
+          echo "Adding a comment to PR #${{ steps.pr-info.outputs.pr_number }} to request manual review."
+          gh pr comment "${{ steps.pr-info.outputs.pr_number }}" --body "✅ The Observatory confirms all required branch protection checks have passed, but this is a **major** version update. It requires manual review and approval."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Handle failed checks
+      - name: "Step 6: Handle Failed Checks"
         if: steps.observatory.outputs.observatory_passed == 'false'
         run: |
-          echo "Observatory reports one or more required checks failed or are pending. Closing the PR."
+          set -euo pipefail
+          echo "❌ Observatory reports one or more required checks failed or are pending."
+          echo "Closing PR #${{ steps.pr-info.outputs.pr_number }}..."
           WORKFLOW_URL="https://github.com/${{ github.repository }}/pull/${{ steps.pr-info.outputs.pr_number }}/checks"
           COMMENT_BODY="🚨 The Observatory reports that one or more **required branch protection checks** have failed or are still pending. I am closing this PR automatically.\n\nPlease review the full list of checks and their logs here: **[All PR Checks](${WORKFLOW_URL})**."
-          gh pr comment ${{ steps.pr-info.outputs.pr_number }} --body "$COMMENT_BODY"
-          gh pr close ${{ steps.pr-info.outputs.pr_number }}
+          gh pr comment "${{ steps.pr-info.outputs.pr_number }}" --body "$COMMENT_BODY"
+          gh pr close "${{ steps.pr-info.outputs.pr_number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
