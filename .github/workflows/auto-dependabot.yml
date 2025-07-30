@@ -23,6 +23,11 @@ jobs:
       statuses: read
 
     steps:
+      # --- 修正点：在这里添加 checkout 步骤 ---
+      - name: "Checkout: Clone repository"
+        uses: actions/checkout@v4
+      # --- 修正结束 ---
+
       - name: "Setup: Verify Dependencies"
         run: |
           set -euo pipefail
