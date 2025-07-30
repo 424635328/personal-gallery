@@ -1,8 +1,6 @@
 // src/app/layout.tsx
 
-// 1. 确保 "use client" 在文件顶部，如果需要创建内部客户端组件
 "use client";
-import type { Metadata } from 'next';
 import { Inter as FontSans, Playfair_Display, Nunito, Noto_Serif_SC, Poppins, VT323, Orbitron } from 'next/font/google';
 import { Suspense } from 'react';
 
