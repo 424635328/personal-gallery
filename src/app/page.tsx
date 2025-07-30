@@ -8,9 +8,9 @@ import { cn } from '@/lib/utils';
 
 // 导入新的、独立的区块组件
 import { HeroSection } from '@/components/sections/home/HeroSection';
-import { TechnologyMarquee } from '@/components/sections/home/TechnologyMarquee';
+import { TechnologyShowcase } from '@/components/sections/home/TechnologyShowcase';
 import { FeatureCards } from '@/components/sections/home/FeatureCards';
-import { Testimonial } from '@/components/sections/home/WorkflowSection';
+import { WorkflowSection } from '@/components/sections/home/WorkflowSection';
 import { FinalCta } from '@/components/sections/home/FinalCta';
 
 export default function HomePage() {
@@ -60,9 +60,9 @@ export default function HomePage() {
       {/* --- 页面区块 (z-index: 默认 0) --- */}
       <div className="z-0 w-full flex flex-col items-center">
         <HeroSection />
-        <TechnologyMarquee />
+        <TechnologyShowcase />
         <FeatureCards />
-        <Testimonial />
+        <WorkflowSection />
         <FinalCta />
       </div>
     </main>

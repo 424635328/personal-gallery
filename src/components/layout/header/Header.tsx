@@ -94,8 +94,9 @@ export function Header() {
               <Image
                 src="/LOGO.jpeg"
                 alt="Gallery Logo"
-                width={36}
-                height={36}
+                
+                width={40}
+                height={40}
                 priority
                 className="rounded-full"
               />

@@ -129,7 +129,7 @@ const GlassShard = React.memo(({ animation, style, ...props }: React.ComponentPr
 ));
 GlassShard.displayName = 'GlassShard';
 
-const StarDust = React.memo(() => <div className="absolute inset-0 h-full w-full bg-repeat opacity-[0.15]" style={{ backgroundImage: "url('/assets/images/noise.png')" }}/>);
+const StarDust = React.memo(() => <div className="absolute inset-0 h-full w-full bg-repeat opacity-[0.15]" style={{ backgroundImage: "url('/textures/noise.png')" }}/>);
 StarDust.displayName = 'StarDust';
 
 type LightOrbProps = Pick<LightOrbConfig, 'top'|'left'|'size'|'color'> & { delay: number; style?: HTMLMotionProps<'div'>['style'] };
