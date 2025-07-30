@@ -6,7 +6,14 @@ import * as React from "react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu";
 import { Sun, Moon, Palette, Smile, Brush, Leaf, Hammer, Terminal, Bot, Zap, BookOpen, Wand } from "lucide-react";
 
 const themes = [
@@ -24,24 +31,45 @@ const themes = [
 ];
 
 export function ThemeToggle() {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleThemeChange = (newTheme: string) => {
-    if (newTheme !== resolvedTheme) {
+    if (newTheme !== theme) {
       setTheme(newTheme);
       const themeConfig = themes.find(t => t.name === newTheme);
       toast.success(`主题已切换: ${themeConfig?.label || newTheme}`);
     }
   };
 
+  // 获取当前主题的图标
+  const CurrentThemeIcon = React.useMemo(() => {
+    if (!mounted) {
+      return <Palette className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    }
+    const currentTheme = themes.find(t => t.name === theme);
+    if (currentTheme) {
+      // 克隆图标元素以修改其 props
+      return React.cloneElement(currentTheme.icon, { className: "h-[1.2rem] w-[1.2rem] transition-all" });
+    }
+    // 默认或 light 主题的图标
+    if (resolvedTheme === 'light') {
+       const lightTheme = themes.find(t => t.name === "theme-warm-sunshine");
+       return lightTheme ? React.cloneElement(lightTheme.icon, { className: "h-[1.2rem] w-[1.2rem] transition-all" }) : <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    }
+    // 如果没有匹配到，则显示默认图标
+    return <Palette className="h-[1.2rem] w-[1.2rem] transition-all" />;
+  }, [theme, resolvedTheme, mounted]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-
-        {/* 暂时未完成主题适配 */}
-
         <Button variant="ghost" size="icon">
-          <Palette className="h-[1.2rem] w-[1.2rem] transition-all" />
+          {CurrentThemeIcon}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
@@ -52,7 +80,7 @@ export function ThemeToggle() {
           <DropdownMenuItem 
             key={t.name} 
             onClick={() => handleThemeChange(t.name)}
-            className={resolvedTheme === t.name ? "bg-accent" : "cursor-pointer"}
+            className={theme === t.name ? "bg-accent" : "cursor-pointer"}
           >
             {t.icon}
             <span className="ml-2">{t.label}</span>
