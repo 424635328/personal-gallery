@@ -72,7 +72,7 @@ export function MobileNav({ onLinkClick }: MobileNavProps) {
                 {/* 3. 更新 onClick 调用，传入 href */}
                 <Link href="/" onClick={() => handleLinkClick("/")} className="flex items-center gap-2">
                   <Image
-                    src="/logo.jpeg" // 统一 Logo 源
+                    src="/LOGO.jpeg" // 统一 Logo 源
                     alt="Logo"
                     width={28}
                     height={28}

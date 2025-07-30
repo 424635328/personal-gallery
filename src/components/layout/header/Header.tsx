@@ -92,7 +92,7 @@ export function Header() {
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
             >
               <Image
-                src="/logo.jpeg"
+                src="/LOGO.jpeg"
                 alt="Gallery Logo"
                 width={36}
                 height={36}
