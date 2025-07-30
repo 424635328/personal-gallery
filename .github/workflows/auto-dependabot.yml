@@ -26,7 +26,8 @@ jobs:
         id: pr-info
         run: |
           echo "pr_number=${{ github.event.workflow_run.pull_requests[0].number }}" >> $GITHUB_OUTPUT
-          PR_HEAD_SHA=$(gh pr view ${{ github.event.workflow_run.pull_requests[0].number }} --json headRef --jq '.headRef.oid')
+          # 修正点：直接获取 headRefOid 字段，而不是通过不存在的 headRef 对象
+          PR_HEAD_SHA=$(gh pr view ${{ github.event.workflow_run.pull_requests[0].number }} --json headRefOid --jq '.headRefOid')
           echo "pr_head_sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
           BASE_BRANCH=$(gh pr view ${{ github.event.workflow_run.pull_requests[0].number }} --json baseRefName --jq '.baseRefName')
           echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
