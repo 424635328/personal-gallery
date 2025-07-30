@@ -22,7 +22,6 @@ import { GoToTopBottom } from '@/components/layout/GoToTopBottom';
 
 import './globals.css';
 
-/* 字体定义 (保持不变) */
 const fontSans = FontSans({ subsets: ['latin'], variable: '--font-sans' });
 const fontSerif = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' });
 const fontDopamine = Nunito({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-dopamine' });
@@ -30,15 +29,6 @@ const fontZen = Noto_Serif_SC({ subsets: ['latin'], weight: ['400', '700'], vari
 const fontSolarpunk = Poppins({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-solarpunk' });
 const fontBrutalist = VT323({ subsets: ['latin'], weight: ['400'], variable: '--font-brutalist' });
 const fontNeon = Orbitron({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-neon' });
-
-/* 
-  因为 layout 组件不能直接是 "use client"，但我们需要在其中使用 hooks (useRef, useContext),
-  所以我们不能直接在这里定义 metadata。
-  请将 metadata 移到一个单独的 `layout.tsx` Server Component 中，或者根据 Next.js 的最新 App Router 指南进行配置。
-  为了让代码能运行，我暂时注释掉它。你需要在你的项目中解决这个问题。
-  一个简单的解决方法是创建一个新的 `(main)/layout.tsx` 来包裹这个客户端布局。
-*/
-// export const metadata: Metadata = { ... };
 
 
 // 3. 创建一个内部 Client Component 来应用 ref 和 Context
@@ -96,7 +86,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <ThemeProvider
             attribute="class"
-            defaultTheme="theme-acid-wave"
+            defaultTheme="dark"
             themes={[
               'dark', 'theme-midnight-grimoire', 'theme-warm-sunshine', 'theme-dopamine-pop',
               'theme-zen-ink', 'theme-solarpunk-utopia', 'theme-rustic-artisan',

@@ -1,3 +1,5 @@
+// src/components/layout/header/MobileNav.tsx
+
 "use client";
 
 import React, { useState } from "react";
@@ -5,12 +7,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Send } from "lucide-react"; // Import Send icon
+
 import { Button } from "@/components/ui/button";
 import { navLinks } from "@/config/nav";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button"; // Import buttonVariants
 
-// 动画变体定义
 const itemVariants = {
   closed: { opacity: 0, y: 20 },
   open: { opacity: 1, y: 0 },
@@ -21,20 +24,18 @@ const listVariants = {
   open: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
 };
 
-// 1. 定义 props 类型以接收点击处理器
+// 1. 更新 props 类型定义，现在 onLinkClick 接收一个 href 字符串
 interface MobileNavProps {
-  onLinkClick: () => void;
+  onLinkClick: (href: string) => void;
 }
 
-// 2. 更新组件签名以接收 onLinkClick prop
 export function MobileNav({ onLinkClick }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  // 3. 创建一个组合的点击处理函数
-  // 这个函数会先触发导航提示，然后关闭菜单
-  const handleLinkClick = () => {
-    onLinkClick();
+  // 2. 更新组合的点击处理函数，使其接受并传递 href
+  const handleLinkClick = (href: string) => {
+    onLinkClick(href);
     setIsOpen(false);
   };
 
@@ -64,18 +65,20 @@ export function MobileNav({ onLinkClick }: MobileNavProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-background shadow-lg"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-background shadow-lg flex flex-col" // 使用 flex-col
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center p-6 border-b">
-                {/* 4. 将新的点击处理器应用到 Logo 链接 */}
-                <Link href="/" onClick={handleLinkClick}>
+              <div className="flex justify-between items-center p-4 border-b">
+                {/* 3. 更新 onClick 调用，传入 href */}
+                <Link href="/" onClick={() => handleLinkClick("/")} className="flex items-center gap-2">
                   <Image
-                    src="/logo.svg"
+                    src="/logo.jpeg" // 统一 Logo 源
                     alt="Logo"
                     width={28}
                     height={28}
+                    className="rounded-full"
                   />
+                  <span className="font-bold text-foreground">Gallery</span>
                 </Link>
                 <Button
                   variant="ghost"
@@ -88,7 +91,7 @@ export function MobileNav({ onLinkClick }: MobileNavProps) {
               </div>
 
               <motion.div
-                className="p-6"
+                className="p-4 flex-1 overflow-y-auto" // 使菜单内容可滚动
                 initial="closed"
                 animate="open"
                 exit="closed"
@@ -105,12 +108,12 @@ export function MobileNav({ onLinkClick }: MobileNavProps) {
                           <ul className="space-y-1 pl-4">
                             {link.items.map((item) => (
                               <motion.li key={item.href} variants={itemVariants}>
-                                {/* 4. 将新的点击处理器应用到下拉菜单链接 */}
+                                {/* 3. 更新 onClick 调用，传入 href */}
                                 <Link
                                   href={item.href}
-                                  onClick={handleLinkClick}
+                                  onClick={() => handleLinkClick(item.href)}
                                   className={cn(
-                                    "block px-3 py-2 rounded-md text-lg",
+                                    "block px-3 py-2 rounded-md text-base",
                                     pathname === item.href
                                       ? "font-semibold text-primary"
                                       : "text-foreground hover:bg-accent"
@@ -123,12 +126,12 @@ export function MobileNav({ onLinkClick }: MobileNavProps) {
                           </ul>
                         </div>
                       ) : (
-                        // 4. 将新的点击处理器应用到标准链接
+                        // 3. 更新 onClick 调用，传入 href
                         <Link
                           href={link.href}
-                          onClick={handleLinkClick}
+                          onClick={() => handleLinkClick(link.href)}
                           className={cn(
-                            "block px-3 py-2 rounded-md text-lg font-medium",
+                            "block px-3 py-2 rounded-md text-base font-medium",
                             pathname === link.href
                               ? "text-primary bg-accent"
                               : "text-foreground hover:bg-accent"
@@ -140,23 +143,23 @@ export function MobileNav({ onLinkClick }: MobileNavProps) {
                     </motion.li>
                   ))}
                 </ul>
-                <motion.div
-                  className="mt-8 pt-6 border-t"
-                  variants={itemVariants}
+              </motion.div>
+
+              <motion.div
+                className="p-4 mt-auto border-t" // mt-auto 将其推到底部
+                variants={itemVariants}
+              >
+                {/* 3. 更新 onClick 调用，传入 href */}
+                <Link
+                  href="/contact"
+                  onClick={() => handleLinkClick("/contact")}
+                  className={cn(
+                    buttonVariants({ size: "lg", className: "w-full" }),
+                  )}
                 >
-                  {/* 4. 将新的点击处理器应用到 “联系我” 链接 */}
-                  <Link
-                    href="/contact"
-                    onClick={handleLinkClick}
-                    className={cn(
-                      "w-full flex items-center justify-center gap-2",
-                      "text-lg font-medium",
-                      "py-3",
-                    )}
-                  >
-                    联系我
-                  </Link>
-                </motion.div>
+                  <Send className="mr-2 h-4 w-4" />
+                  联系我
+                </Link>
               </motion.div>
             </motion.div>
           </motion.div>

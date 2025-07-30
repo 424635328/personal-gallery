@@ -2,48 +2,68 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { Send } from "lucide-react";
+import { toast } from "sonner";
 
-// 导入 toast 函数
-import { toast } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { DesktopNav } from "./DesktopNav";
 import { MobileNav } from "./MobileNav";
+import { useScrollContainer } from "@/contexts/ScrollContext";
 
-const headerVariants = {
-  top: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)", 
-    backdropFilter: "blur(0px)",
-    borderColor: "rgba(231, 231, 231, 0)", 
-    boxShadow: "0 0 0 0 rgba(0,0,0,0)",
-  },
-  scrolled: {
-    backgroundColor: "hsla(var(--background) / 0.8)",
-    backdropFilter: "blur(12px)",
-    borderColor: "hsl(var(--border) / 0.1)",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-  },
-};
 
 export function Header() {
-  const { scrollY } = useScroll();
-  const [scrolled, setScrolled] = useState(false);
+  const { mainRef } = useScrollContainer();
+  const currentPathname = usePathname();
+  
+  const [isVisible, setIsVisible] = useState(true);
+  // 使用 useRef 来存储上一次的滚动位置，避免不必要的重渲染
+  const lastScrollY = useRef(0);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setScrolled(latest > 50);
-  });
+  // 使用 useEffect 监听滚动事件
+  useEffect(() => {
+    const mainEl = mainRef.current;
+    if (!mainEl) return;
 
-  // 1. 创建处理导航点击的函数
-  const handleNavigationStart = () => {
-    // 显示一个加载中的 toast，并获取其 ID
+    const handleScroll = () => {
+      const currentScrollY = mainEl.scrollTop;
+
+      // 仅在滚动超过 Header 高度后才开始判断
+      // 使用一个小的阈值（5px）来防止滚动抖动导致的频繁切换
+      if (Math.abs(currentScrollY - lastScrollY.current) > 5) {
+        if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
+          // 向下滚动 -> 隐藏 Header
+          setIsVisible(false);
+        } else {
+          // 向上滚动 -> 显示 Header
+          setIsVisible(true);
+        }
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    mainEl.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      mainEl.removeEventListener('scroll', handleScroll);
+    };
+  }, [mainRef]);
+
+  // 导航点击处理器
+  const handleNavigationStart = (href: string) => {
+    // 核心检查：如果目标路径与当前路径相同，则不执行任何操作
+    if (href === currentPathname) {
+      return;
+    }
+
     const toastId = toast.loading("正在加载页面...");
-    // 派发自定义事件，并将 toastId 放在 detail 中
     window.dispatchEvent(
       new CustomEvent('offerScoreNavigationStart', {
         detail: { toastId },
@@ -53,25 +73,23 @@ export function Header() {
 
   return (
     <motion.header
-      className="sticky top-0 z-50 w-full border-b"
-      initial="top"
-      animate={scrolled ? "scrolled" : "top"}
-      variants={headerVariants}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="sticky top-0 z-50 w-full  bg-background/10 backdrop-blur-lg"
+      animate={isVisible ? "visible" : "hidden"}
+      initial="visible" // 保证初始加载时可见
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo Area */}
+          
+          {/* Logo 区域 */}
           <Link 
             href="/" 
             className="flex items-center space-x-2.5 group"
-            // 2. 将点击事件处理器添加到 Logo 链接
-            onClick={handleNavigationStart}
+            onClick={() => handleNavigationStart("/")}
           >
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
             >
               <Image
                 src="/logo.jpeg"
@@ -79,37 +97,38 @@ export function Header() {
                 width={36}
                 height={36}
                 priority
+                className="rounded-full"
               />
             </motion.div>
-            <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500">
+            <span className={cn(
+              "text-xl font-bold tracking-tight text-foreground",
+              "theme-zen-ink:text-primary",
+              "theme-solarpunk-utopia:text-primary"
+            )}>
               Gallery
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          {/* 3. 将处理器作为 prop 传递给导航组件 */}
+          {/* 桌面导航 */}
           <DesktopNav onLinkClick={handleNavigationStart} />
 
-          {/* Right-side Actions */}
+          {/* 右侧操作区 */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             <ThemeToggle />
             
             <Link
               href="/contact"
               className={cn(
-                buttonVariants({ variant: "default" }),
-                "hidden sm:flex items-center gap-2 group",
-                "transition-all duration-300 ease-out hover:shadow-lg hover:scale-105"
+                buttonVariants({ variant: "default", size: "default" }),
+                "hidden sm:flex items-center gap-2"
               )}
-              // 2. 将点击事件处理器添加到 “联系我” 链接
-              onClick={handleNavigationStart}
+              onClick={() => handleNavigationStart("/contact")}
             >
-              <Send className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-12" />
+              <Send className="h-4 w-4" />
               联系我
             </Link>
 
-            {/* Mobile Navigation Trigger */}
-            {/* 3. 将处理器作为 prop 传递给导航组件 */}
+            {/* 移动端导航 */}
             <MobileNav onLinkClick={handleNavigationStart} />
           </div>
         </div>

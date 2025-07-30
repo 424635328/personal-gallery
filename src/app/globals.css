@@ -466,7 +466,7 @@
   /* 午夜秘典主题 */
   .theme-midnight-grimoire {
     .hero-bg-grimoire {
-      @apply bg-[url('/noise-texture.png')] opacity-15;
+      @apply bg-[url('/texture/noise.png')] opacity-15;
     }
     .button-grimoire {
       border: 1px solid hsl(var(--border));
@@ -524,7 +524,7 @@
   /* 拼贴朋克主题 */
   .theme-collage-punk {
     .bg-zine {
-      background-image: url('/tape-texture.png'), url('/photocopy-noise.png');
+      background-image: url('/tape-texture.png'), url('/grid-texture.png');
       background-color: hsl(var(--background));
       background-blend-mode: multiply, normal;
     }
