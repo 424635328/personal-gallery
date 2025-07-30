@@ -10,6 +10,11 @@ on:
     types:
       - completed
 
+# <-- 添加并发控制，防止竞态条件 -->
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.workflow_run.pull_requests[0].number }}-observatory
+  cancel-in-progress: true
+
 jobs:
   handle_dependabot_pr:
     # 确保是由 dependabot 触发，并且确实关联了一个 PR
@@ -20,13 +25,11 @@ jobs:
     permissions:
       pull-requests: write
       contents: write
-      statuses: read
+      checks: read
 
     steps:
-      # --- 修正点：在这里添加 checkout 步骤 ---
       - name: "Checkout: Clone repository"
         uses: actions/checkout@v4
-      # --- 修正结束 ---
 
       - name: "Setup: Verify Dependencies"
         run: |
@@ -42,7 +45,6 @@ jobs:
           set -euo pipefail
           echo "🔍 Extracting PR information from workflow run..."
           
-          # 从事件上下文中获取 PR 编号
           PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number }}"
           if [ -z "$PR_NUMBER" ]; then
             echo "❌ ERROR: Could not find an associated PR number."
@@ -50,16 +52,14 @@ jobs:
           fi
           echo "PR Number: $PR_NUMBER"
           
-          # 使用 gh cli 获取 PR 的 head SHA 和 base branch
-          # 注意：所有变量引用都使用双引号，增强健壮性
           echo "Fetching PR details using GitHub CLI..."
-          PR_HEAD_SHA=$(gh pr view "$PR_NUMBER" --json headRefOid --jq '.headRefOid')
-          BASE_BRANCH=$(gh pr view "$PR_NUMBER" --json baseRefName --jq '.baseRefName')
+          PR_JSON=$(gh pr view "$PR_NUMBER" --json headRefOid,baseRefName)
+          PR_HEAD_SHA=$(echo "$PR_JSON" | jq -r '.headRefOid')
+          BASE_BRANCH=$(echo "$PR_JSON" | jq -r '.baseRefName')
 
           echo "PR Head SHA: $PR_HEAD_SHA"
           echo "Base Branch: $BASE_BRANCH"
 
-          # 将提取的信息输出给后续步骤使用
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
           echo "pr_head_sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
           echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
@@ -73,26 +73,29 @@ jobs:
           echo "🔭 Observing PR #${{ steps.pr-info.outputs.pr_number }} for branch '${{ steps.pr-info.outputs.base_branch }}'..."
           
           echo "Fetching branch protection rules..."
-          REQUIRED_CHECKS=$(gh api "repos/${{ github.repository }}/branches/${{ steps.pr-info.outputs.base_branch }}/protection" --jq '.required_status_checks.contexts[]' | jq -r 'select(. != null)' || true)
+          # 使用 --silent 标志来抑制 gh 在未找到保护规则时的非零退出码
+          REQUIRED_CHECKS_JSON=$(gh api "repos/${{ github.repository }}/branches/${{ steps.pr-info.outputs.base_branch }}/protection" --jq '.required_status_checks.contexts' 2>/dev/null || echo "[]")
           
-          if [ -z "$REQUIRED_CHECKS" ]; then
+          # 使用 jq 检查返回的是否是数组以及是否为空
+          if [[ "$(echo "$REQUIRED_CHECKS_JSON" | jq 'if type=="array" and length==0 then "empty" else "ok" end')" == '"empty"' ]]; then
             echo "✅ No required status checks found in branch protection rules. Gatekeeper passes by default."
             echo "observatory_passed=true" >> $GITHUB_OUTPUT
             exit 0
           fi
           
+          REQUIRED_CHECKS=$(echo "$REQUIRED_CHECKS_JSON" | jq -r '.[]')
           echo "Required checks according to branch protection rules:"
           echo "$REQUIRED_CHECKS"
 
           echo "Fetching actual check runs for commit: ${{ steps.pr-info.outputs.pr_head_sha }}"
-          ALL_CHECKS_JSON=$(gh api "repos/${{ github.repository }}/commits/${{ steps.pr-info.outputs.pr_head_sha }}/check-runs" --jq '.check_runs[] | {name: .name, conclusion: .conclusion}')
+          ALL_CHECKS_JSON=$(gh api "repos/${{ github.repository }}/commits/${{ steps.pr-info.outputs.pr_head_sha }}/check-runs" --jq '.check_runs')
           echo "Actual checks found on commit:"
-          echo "$ALL_CHECKS_JSON"
+          echo "$ALL_CHECKS_JSON" | jq '.[] | {name: .name, conclusion: .conclusion}'
+
 
           ALL_PASS=true
           while IFS= read -r CHECK_NAME; do
-            # 使用 jq 的 --arg 来安全地传递变量
-            CONCLUSION=$(echo "$ALL_CHECKS_JSON" | jq -r --arg name "$CHECK_NAME" 'select(.name == $name) | .conclusion')
+            CONCLUSION=$(echo "$ALL_CHECKS_JSON" | jq -r --arg name "$CHECK_NAME" '.[] | select(.name == $name) | .conclusion')
             
             if [[ "$CONCLUSION" == "success" ]]; then
               echo "✅ SUCCESS: Required check '$CHECK_NAME' passed."
