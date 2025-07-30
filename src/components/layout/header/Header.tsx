@@ -60,7 +60,7 @@ export function Header() {
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo Area */}
           <Link 
             href="/" 

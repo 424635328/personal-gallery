@@ -14,6 +14,14 @@ const config: Config = {
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    // 添加标准的 container 配置，便于内容居中
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
   	extend: {
   		fontFamily: {
   			sans: ['var(--font-sans)'],
@@ -76,6 +84,7 @@ const config: Config = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		keyframes: {
+        // shadcn/ui 默认动画
   			'accordion-down': {
   				from: { height: '0' },
   				to: { height: 'var(--radix-accordion-content-height)' }
@@ -84,6 +93,7 @@ const config: Config = {
   				from: { height: 'var(--radix-accordion-content-height)' },
   				to: { height: '0' }
   			},
+        // 自定义动画
   			blink: {
   				'from, to': { borderColor: 'transparent' },
   				'50%': { borderColor: 'currentColor' }
@@ -106,28 +116,44 @@ const config: Config = {
           from: { "background-position": '0% 50%' },
           to: { "background-position": '100% 50%' },
         },
+        // 为 TechnologyMarquee 组件添加的动画
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
   		},
   		animation: {
+        // shadcn/ui 默认动画
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
+        // 自定义动画
   			blink: 'blink 1s step-end infinite',
   			'aurora-move': 'moveBlob 12s ease-in-out infinite alternate',
   			glitch: 'glitch 0.2s linear infinite',
-		'aurora': 'aurora 8s ease-in-out infinite alternate',
+		    'aurora': 'aurora 8s ease-in-out infinite alternate',
+        // 为 TechnologyMarquee 组件添加的动画
+        marquee: 'marquee 40s linear infinite',
 	  },
 	},
   },
   plugins: [
-	tailwindcssAnimate,
-	typography,
-	plugin(function({ addVariant }) {
-	  addVariant('theme-warm-sunshine', '.theme-warm-sunshine &');
-	  addVariant('theme-dopamine-pop', '.theme-dopamine-pop &');
-	  addVariant('theme-zen-ink', '.theme-zen-ink &');
-	  addVariant('theme-solarpunk-utopia', '.theme-solarpunk-utopia &');
-	  addVariant('theme-rustic-artisan', '.theme-rustic-artisan &');
-	  addVariant('theme-brutalist-glitch', '.theme-brutalist-glitch &');
-	})
+	  tailwindcssAnimate,
+	  typography,
+    // 自定义插件，用于添加所有主题的变体
+	  plugin(function({ addVariant }) {
+      // 已有的变体
+	    addVariant('theme-warm-sunshine', '.theme-warm-sunshine &');
+	    addVariant('theme-dopamine-pop', '.theme-dopamine-pop &');
+	    addVariant('theme-zen-ink', '.theme-zen-ink &');
+	    addVariant('theme-solarpunk-utopia', '.theme-solarpunk-utopia &');
+	    addVariant('theme-rustic-artisan', '.theme-rustic-artisan &');
+	    addVariant('theme-brutalist-glitch', '.theme-brutalist-glitch &');
+      // 新增的变体
+      addVariant('theme-retro-pixel', '.theme-retro-pixel &');
+      addVariant('theme-acid-wave', '.theme-acid-wave &');
+      addVariant('theme-midnight-grimoire', '.theme-midnight-grimoire &');
+      addVariant('theme-collage-punk', '.theme-collage-punk &');
+	  })
   ],
 }
-export default config
+export default config;

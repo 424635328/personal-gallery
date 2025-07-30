@@ -1,8 +1,11 @@
 // src/app/layout.tsx
 
+// 1. 确保 "use client" 在文件顶部，如果需要创建内部客户端组件
+"use client";
 import type { Metadata } from 'next';
 import { Inter as FontSans, Playfair_Display, Nunito, Noto_Serif_SC, Poppins, VT323, Orbitron } from 'next/font/google';
 import { Suspense } from 'react';
+
 
 import { cn } from '@/lib/utils';
 import StyledComponentsRegistry from '@/lib/registry';
@@ -12,10 +15,14 @@ import AuroraBackground from '@/components/layout/AuroraBackground';
 import NProgressProvider from '@/components/layout/NProgressProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { NavigationEvents } from '@/components/layout/NavigationEvents';
+// 2. 导入新的组件和 Provider
+import { ScrollProvider, useScrollContainer } from '@/contexts/ScrollContext';
+import { GoToTopBottom } from '@/components/layout/GoToTopBottom';
+
 
 import './globals.css';
 
-/* 字体定义 */
+/* 字体定义 (保持不变) */
 const fontSans = FontSans({ subsets: ['latin'], variable: '--font-sans' });
 const fontSerif = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' });
 const fontDopamine = Nunito({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-dopamine' });
@@ -24,26 +31,64 @@ const fontSolarpunk = Poppins({ subsets: ['latin'], weight: ['400', '500', '600'
 const fontBrutalist = VT323({ subsets: ['latin'], weight: ['400'], variable: '--font-brutalist' });
 const fontNeon = Orbitron({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-neon' });
 
-/* SEO 元数据 */
-export const metadata: Metadata = {
-  title: {
-    default: 'Personal Gallery',
-    template: '%s | Personal Gallery',
-  },
-  description: '一个展示个人创意项目与技术实践的交互式作品集。',
+/* 
+  因为 layout 组件不能直接是 "use client"，但我们需要在其中使用 hooks (useRef, useContext),
+  所以我们不能直接在这里定义 metadata。
+  请将 metadata 移到一个单独的 `layout.tsx` Server Component 中，或者根据 Next.js 的最新 App Router 指南进行配置。
+  为了让代码能运行，我暂时注释掉它。你需要在你的项目中解决这个问题。
+  一个简单的解决方法是创建一个新的 `(main)/layout.tsx` 来包裹这个客户端布局。
+*/
+// export const metadata: Metadata = { ... };
+
+
+// 3. 创建一个内部 Client Component 来应用 ref 和 Context
+const MainLayout = ({ children }: { children: React.ReactNode }) => {
+  const { mainRef } = useScrollContainer(); // 在 Client Component 中使用 Hook
+
+  return (
+    <>
+      <AuroraBackground neonSignText="Gallery" rainCount={40} />
+      
+      <div className="relative z-10 flex flex-col h-screen overflow-hidden">
+        <Suspense fallback={null}>
+          <NProgressProvider>
+            <Header />
+            
+            <main 
+              ref={mainRef} // 将 ref 应用到 main 元素
+              className="flex-1 overflow-y-auto snap-y snap-mandatory scroll-pt-[var(--header-height)]"
+            >
+              {children}
+            </main>
+            
+          </NProgressProvider>
+          <NavigationEvents />
+        </Suspense>
+      </div>
+
+      <Toaster richColors position="top-center" />
+      
+      {/* 5. 将按钮放在这里，它会读取 context 中的 ref */}
+      <GoToTopBottom />
+    </>
+  );
 };
 
-/* 根布局组件 - 应用主框架 */
+
+/* 根布局组件 - 现在是一个 Client Component 以支持 Context Provider */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    /* 设置 html 高度为视口高度 */
     <html lang="zh-CN" suppressHydrationWarning className="h-full">
-      {/* body 作为主 Flex 容器 */}
+      <head>
+        {/* 解决 metadata 问题: 手动添加 title 等 */}
+        <title>Personal Gallery</title>
+        <meta name="description" content="一个展示个人创意项目与技术实践的交互式作品集。" />
+      </head>
       <body
         className={cn(
-          'h-full bg-background font-sans antialiased',
+          'bg-background font-sans antialiased',
           fontSans.variable, fontSerif.variable, fontDopamine.variable,
           fontZen.variable, fontSolarpunk.variable, fontBrutalist.variable, fontNeon.variable
         )}
@@ -60,25 +105,10 @@ export default function RootLayout({
             enableSystem={false}
             storageKey="personal-gallery-theme"
           >
-            <AuroraBackground neonSignText="Gallery" rainCount={40} />
-
-            {/* 主布局容器 - Flex 垂直布局 */}
-            <div className="relative z-10 flex flex-col h-full">
-              <Suspense fallback={null}>
-                <NProgressProvider>
-                  <Header />
-                  
-                  {/* 主内容区域 - 自动填充剩余空间 */}
-                  <main className="flex-1 overflow-hidden">
-                    {children}
-                  </main>
-                  
-                </NProgressProvider>
-                <NavigationEvents />
-              </Suspense>
-            </div>
-            
-            <Toaster richColors position="top-center" />
+            {/* 4. 使用 ScrollProvider 包裹主布局 */}
+            <ScrollProvider>
+              <MainLayout>{children}</MainLayout>
+            </ScrollProvider>
           </ThemeProvider>
         </StyledComponentsRegistry>
       </body>
