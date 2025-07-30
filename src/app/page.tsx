@@ -46,15 +46,7 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 right-auto top-auto h-[400px] w-[400px] -translate-x-[20%] -translate-y-[20%] rounded-full bg-gradient-radial from-secondary/5 via-transparent to-transparent opacity-50 blur-3xl"></div>
       </div>
 
-      {/* 
-        * ====================================================================
-        * 新增：毛玻璃蒙版层 (z-index: -10)
-        * - `absolute inset-0`: 绝对定位并铺满父容器。
-        * - `-z-10`: 层级介于背景(-20)和内容(默认0)之间。
-        * - `backdrop-blur-2xl`: 应用强烈的毛玻璃效果。你可以调整 (e.g., -sm, -md, -lg)。
-        * - `bg-background/10`: 添加一层极淡的、与主题匹配的背景色，增强效果。
-        * ====================================================================
-      */}
+      
       <div className="absolute inset-0 -z-10  bg-background/65"></div>
 
       {/* --- 页面区块 (z-index: 默认 0) --- */}

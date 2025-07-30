@@ -28,7 +28,7 @@ const ctaItems = [
     icon: Mail,
     text: "邮件联系",
     subtext: "开启对话",
-    href: "mailto:your-email@example.com",
+    href: "mailto:424635328@qq.com",
     isExternal: true,
   },
   {
@@ -42,7 +42,7 @@ const ctaItems = [
     icon: Github,
     text: "GitHub",
     subtext: "查看源码",
-    href: "https://github.com/your-username",
+    href: "https://github.com/424635328/personal-gallery",
     isExternal: true,
   },
 ];

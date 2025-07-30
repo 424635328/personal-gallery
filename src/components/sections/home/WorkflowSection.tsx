@@ -2,6 +2,7 @@
 
 // 1. 从 react 中多导入一个 useMemo
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrainCircuit, Blocks, Code, Sparkles, Rocket } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -50,14 +51,14 @@ const DiscoveryVisual = () => {
 const DesignVisual = () => (
     <motion.div variants={visualVariants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 p-8 flex flex-col justify-center items-center gap-4">
         <motion.img 
-        src="https://user-images.githubusercontent.com/424635328/200171638-16dc756f-8a03-4613-8994-5c91a0c878e1.png" // Placeholder Wireframe
+        src="/images/placeholder-wireframe.png" // Placeholder Wireframe
         alt="Wireframe"
         initial={{ opacity: 1, y: 0 }}
         animate={{ opacity: 0.1, y: -10, transition: { duration: 1, delay: 0.5, repeat: Infinity, repeatType: "reverse" } }}
         className="absolute inset-0 w-full h-full object-contain"
         />
         <motion.img 
-        src="https://user-images.githubusercontent.com/424635328/200171639-6d656157-548c-4475-8b3d-51a87b8d4c38.png" // Placeholder UI
+        src="/images/placeholder-ui.png" // Placeholder UI
         alt="UI Component"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, transition: { duration: 0.5, delay: 0.3 } }}
@@ -90,16 +91,18 @@ const DevelopmentVisual = () => (
 
 const DeploymentVisual = () => (
     <motion.div variants={visualVariants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 flex flex-col items-center justify-center gap-6">
-        <motion.button 
+        <Link href="/projects" passHref legacyBehavior={false}> {/* 2. 使用 Link 包裹 */}
+    <motion.button 
         className="relative px-8 py-4 bg-primary text-primary-foreground font-bold rounded-lg text-xl shadow-lg"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ boxShadow: "0 0 0px hsl(var(--primary))" }}
         animate={{ boxShadow: ["0 0 20px hsl(var(--primary)/0.5)", "0 0 40px hsl(var(--primary)/0.3)", "0 0 20px hsl(var(--primary)/0.5)"], transition: { duration: 2, repeat: Infinity } }}
-        >
+    >
         <Rocket className="inline-block mr-2" />
         LAUNCH
-        </motion.button>
+    </motion.button>
+</Link>
         {[...Array(30)].map((_, i) => (
         <motion.div
             key={i}
