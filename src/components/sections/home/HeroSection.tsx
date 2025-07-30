@@ -24,7 +24,7 @@ export const HeroSection = () => {
       className={cn(
         "w-full max-w-5xl text-center flex flex-col items-center justify-center snap-start",
         // 保持这个公式，确保板块能填满 Header 下方的屏幕空间
-        "min-h-[calc(100vh-var(--header-height))]",
+        "min-h-[calc(90vh-var(--header-height))]",
         // 调整垂直内边距来控制内容与 Header 的距离
         "pt-10 pb-20 px-4" // 原来是 py-20
       )}

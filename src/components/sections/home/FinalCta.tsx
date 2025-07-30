@@ -40,7 +40,7 @@ export const FinalCta = () => {
       className={cn(
         "w-full snap-start flex flex-col items-center justify-center",
         // 1. 统一最小高度
-        "min-h-[calc(100vh-var(--header-height))]",
+        "min-h-[calc(95vh-var(--header-height))]",
         // 2. 统一内边距
         "pt-10 pb-20 px-4"
       )}

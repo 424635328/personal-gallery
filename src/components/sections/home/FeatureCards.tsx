@@ -49,7 +49,7 @@ export const FeatureCards = () => {
       className={cn(
         "w-full max-w-6xl text-center snap-start flex flex-col items-center justify-center",
         // 1. 统一最小高度
-        "min-h-[calc(100vh-var(--header-height))]",
+        "min-h-[calc(90vh-var(--header-height))]",
         // 2. 统一内边距 (与 HeroSection 一致)
         "pt-10 pb-20 px-4"
       )}

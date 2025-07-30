@@ -25,7 +25,7 @@ export const TechnologyMarquee = () => {
       className={cn(
         "w-full flex flex-col items-center justify-center overflow-hidden",
         "snap-start", // 添加吸附点
-        "min-h-[calc(100vh-var(--header-height))]", // 添加最小高度
+        "min-h-[calc(90vh-var(--header-height))]", // 添加最小高度
         // 1. 调整垂直内边距以匹配 HeroSection 标准
         "pt-10 pb-20 px-4" // 原来是 py-24
         // 2. 移除 min-h，因为它不是一个需要占满全屏的吸附点

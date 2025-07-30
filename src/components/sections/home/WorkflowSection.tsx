@@ -44,7 +44,7 @@ export const Testimonial = () => { // 建议重命名为 WorkflowSection
     <section 
       className={cn(
         "w-full max-w-4xl px-4 snap-start flex flex-col items-center justify-center",
-        "min-h-[calc(100vh-var(--header-height))]",
+        "min-h-[calc(80vh-var(--header-height))]",
         "pt-10 pb-20"
       )}
     >
