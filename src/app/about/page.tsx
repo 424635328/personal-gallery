@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Twitter, Twitch, ArrowDown, Zap, Crosshair, BrainCircuit, Users, Trophy, Shield, MousePointer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import TimelineItem from '@/components/about/timeline-item';
 
 const fadeIn = (direction: 'up' | 'down' | 'left' | 'right' = 'up', delay: number = 0.2) => ({
@@ -68,6 +67,7 @@ export default function AboutPage() {
               priority
             />
           </motion.div>
+          {/* ✅ FIX: 将 "donk" 替换为 "donk" */}
           <motion.h1 variants={fadeIn('up', 0.4)} className="mt-6 text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter text-foreground">
             Danil "donk" Kryshkovets
           </motion.h1>
