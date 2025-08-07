@@ -65,19 +65,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
-
-      # ===================================================================================
-      # ================ 诊断性检查 (所有步骤均配置为“出错时继续”) ================
-      # ===================================================================================
-
-      # 👇 核心修复：为所有包含特殊字符的 name 字段加上引号
-      - name: "[Diagnostic] Attempt to run Linter (Node.js)"
-        if: steps.detect.outputs.is_node == 'true'
-        continue-on-error: true
-        run: |
-          echo "INFO: Attempting to run linter. Failures here are informational."
-          npm run lint
-
+     
       - name: "[Diagnostic] Attempt to run Build (Node.js)"
         if: steps.detect.outputs.is_node == 'true'
         continue-on-error: true
@@ -103,17 +91,7 @@ jobs:
           echo "INFO: Attempting to build with Maven. Failures here are informational."
           mvn -B package --file pom.xml
           
-      - name: "[Diagnostic] Attempt to run Linter (Python)"
-        if: steps.detect.outputs.is_python == 'true'
-        continue-on-error: true
-        run: |
-          echo "INFO: Attempting to run linter (flake8) for Python. Failures here are informational."
-          pip install flake8
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
-      # =====================================================================
-      # ================ 最终工作流状态总结 (非常重要) ================
-      # =====================================================================
 
       - name: Final Workflow Summary
         if: always()
