@@ -14,8 +14,7 @@
 
 这是一个使用 **Next.js (App Router)**, **TypeScript**, 和 **Framer Motion** 构建的，具有高度交互性和深度主题化能力的个人作品集模板。它不仅是一个展示项目的平台，其本身就是一个精心雕琢的前端艺术品。
 
-**🚀 在线体验:** [https://your-gallery-url.vercel.app](https://pgal.vercel.app/) <!-- 请将此链接替换为您部署后的地址 -->
-
+**🚀 在线体验:** [https://pgal.vercel.app/](https://pgal.vercel.app/)
 
 ---
 
